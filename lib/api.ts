@@ -1,12 +1,21 @@
 import { ApiResponse, Category, Channel, MatchEvent, StreamToken } from "./types";
 
+function resolveBase(host: string): string {
+  if (host.startsWith("http://") || host.startsWith("https://")) return host;
+  return `https://${host}`;
+}
+
 function getApiBase(): string {
   // Server-side: read at runtime from non-public env var
   if (typeof window === "undefined") {
-    return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    return resolveBase(
+      process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+    );
   }
   // Client-side: NEXT_PUBLIC_* is inlined at build time
-  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  return resolveBase(
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+  );
 }
 
 const TIMEOUT_MS = 15_000;
