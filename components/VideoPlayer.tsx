@@ -405,8 +405,8 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
             poster={poster}
             className="h-full w-full object-contain"
             playsInline
-            webkit-playsinline
-            x5-playsinline
+            webkit-playsinline="true"
+            x5-playsinline="true"
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={handleLoadedMetadata}
             onPlay={handlePlay}
