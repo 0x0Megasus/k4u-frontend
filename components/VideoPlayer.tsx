@@ -30,6 +30,23 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
   const [retryCount, setRetryCount] = useState(0);
 
   const [playing, setPlaying] = useState(false);
+  const [showLoading, setShowLoading] = useState(true);
+
+  // Show loading overlay whenever src changes, hide once loading finishes + video starts
+  useEffect(() => {
+    if (src) setShowLoading(true);
+  }, [src]);
+
+  // Hide loading when loading finishes (with brief delay for smooth transition)
+  // or immediately on error
+  useEffect(() => {
+    if (error) {
+      setShowLoading(false);
+    } else if (!loading && src) {
+      const t = setTimeout(() => setShowLoading(false), 400);
+      return () => clearTimeout(t);
+    }
+  }, [loading, error, src]);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
@@ -398,11 +415,16 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
             onClick={togglePlay}
           />
 
-          {/* Loading overlay */}
-          {loading && (
-            <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60">
-              <div className="flex flex-col items-center gap-4">
-                <div className="h-10 w-10 animate-spin rounded-full border-2 border-violet-500/30 border-t-violet-400" />
+          {/* Loading overlay — stays until video actually plays */}
+          {showLoading && (
+            <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 transition-opacity duration-300">
+              <div className="flex flex-col items-center gap-5">
+                {/* Pulsing rings */}
+                <div className="relative flex items-center justify-center">
+                  <div className="absolute h-16 w-16 animate-ping rounded-full border-2 border-violet-500/40" />
+                  <div className="absolute h-12 w-12 animate-ping rounded-full border-2 border-violet-500/30 [animation-delay:0.3s]" />
+                  <div className="h-10 w-10 animate-spin rounded-full border-2 border-violet-500/30 border-t-violet-400" />
+                </div>
                 <p className="text-sm font-bold tracking-wide text-violet-300/90">
                   جاري تحميل البث...
                 </p>
@@ -439,7 +461,7 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
           )}
 
           {/* Center play overlay when paused */}
-          {!loading && !error && !playing && (
+          {!showLoading && !error && !playing && (
             <div
               className="absolute inset-0 z-10 flex cursor-pointer items-center justify-center"
               onClick={togglePlay}
