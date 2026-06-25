@@ -1,6 +1,8 @@
 import { ApiResponse, Category, Channel, MatchEvent, StreamToken } from "./types";
 
-export const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+function getApiBase(): string {
+  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+}
 
 const TIMEOUT_MS = 15_000;
 
@@ -9,7 +11,7 @@ async function fetchApi<T>(path: string): Promise<ApiResponse<T>> {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
-    const res = await fetch(`${API_BASE}${path}`, {
+    const res = await fetch(`${getApiBase()}${path}`, {
       signal: controller.signal,
     });
     clearTimeout(timeout);
@@ -37,7 +39,7 @@ async function fetchApi<T>(path: string): Promise<ApiResponse<T>> {
  * sources — the real CDN URL never reaches the browser.
  */
 export function getStreamProxyUrl(token: string): string {
-  return `${API_BASE}/api/proxy/stream/${encodeURIComponent(token)}`;
+  return `${getApiBase()}/api/proxy/stream/${encodeURIComponent(token)}`;
 }
 
 export function getCategories(): Promise<ApiResponse<Category[]>> {
