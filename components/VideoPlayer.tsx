@@ -165,7 +165,7 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
         if (!isDraggingSeekRef.current) {
           setControlsVisible(false);
         }
-      }, 3000);
+      }, 1500);
     }
   }, []);
 
@@ -206,6 +206,45 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
     const handler = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener("fullscreenchange", handler);
     return () => document.removeEventListener("fullscreenchange", handler);
+  }, []);
+
+  // --- Auto fullscreen on phone rotation ---
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const isMobile = () => window.innerWidth < 768;
+
+    const handleOrientationChange = () => {
+      if (!isMobile()) return;
+
+      // After a short delay to let the browser settle on the new orientation
+      setTimeout(() => {
+        if (window.innerHeight < window.innerWidth) {
+          // Landscape → enter fullscreen
+          if (!document.fullscreenElement) {
+            containerRef.current?.requestFullscreen().catch(() => {});
+          }
+        } else {
+          // Portrait → exit fullscreen
+          if (document.fullscreenElement) {
+            document.exitFullscreen().catch(() => {});
+          }
+        }
+      }, 200);
+    };
+
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    window.addEventListener("orientationchange", handleOrientationChange);
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+
+    return () => {
+      window.removeEventListener("orientationchange", handleOrientationChange);
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
   }, []);
 
   // --- Video event handlers ---
@@ -315,9 +354,11 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
   return (
     <div
       ref={containerRef}
-      className={`relative w-full overflow-hidden border-2 border-[hsl(var(--border))] rounded-[2px] bg-black ${
-        !controlsVisible && playing ? "cursor-none" : ""
-      } ${isFullscreen ? "h-screen" : "aspect-video"}`}
+      className={`relative w-full overflow-hidden ${
+         isFullscreen ? "!border-0" : "border-2 border-[hsl(var(--border))]"
+       } rounded-[2px] bg-black ${
+         !controlsVisible && playing ? "cursor-none" : ""
+       } ${isFullscreen ? "h-screen" : "aspect-video"}`}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
@@ -347,6 +388,8 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
             poster={poster}
             className="h-full w-full object-contain"
             playsInline
+            webkit-playsinline
+            x5-playsinline
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={handleLoadedMetadata}
             onPlay={handlePlay}
@@ -476,7 +519,7 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
                   </button>
                   <div
                     ref={volumeRef}
-                    className="h-1 w-16 cursor-pointer rounded-full bg-white/20"
+                    className="hidden md:flex h-1 w-16 cursor-pointer rounded-full bg-white/20"
                     onClick={handleVolumeClick}
                   >
                     <div
