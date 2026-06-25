@@ -98,6 +98,16 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
           fragLoadingTimeOut: 30000,
           startLevel: -1,
           debug: false,
+          // A/V sync tuning
+          maxAudioFramesDrift: 2,
+          stretchShortVideoTrack: true,
+          maxLiveSyncPlaybackRate: 1.25,
+          liveSyncDurationCount: 4,
+          liveMaxLatencyDurationCount: 8,
+          liveSyncMode: "buffered",
+          forceKeyFrameOnDiscontinuity: true,
+          maxBufferHole: 0.1,
+          nudgeOffset: 0.5,
         });
         hls.loadSource(src);
         hls.attachMedia(video);
