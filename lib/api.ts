@@ -1,6 +1,11 @@
 import { ApiResponse, Category, Channel, MatchEvent, StreamToken } from "./types";
 
 function getApiBase(): string {
+  // Server-side: read at runtime from non-public env var
+  if (typeof window === "undefined") {
+    return process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  }
+  // Client-side: NEXT_PUBLIC_* is inlined at build time
   return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 }
 
