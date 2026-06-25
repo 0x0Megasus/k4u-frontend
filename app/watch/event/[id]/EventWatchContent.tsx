@@ -90,7 +90,7 @@ export default function EventWatchContent({
       <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
         {/* Main content */}
         <div className="space-y-4">
-          <VideoPlayer src={streamUrl} />
+          <VideoPlayer src={streamUrl} isLive={live} />
 
           {/* Match info */}
           <div className="space-y-3 border-2 border-[hsl(var(--border))] bg-[hsl(var(--card))] rounded-[2px] p-4">
@@ -125,10 +125,10 @@ export default function EventWatchContent({
             {live && (
               <div className="flex items-center gap-2">
                 <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
                 </span>
-                <span className="text-[11px] font-semibold text-green-400 tracking-wider">
+                <span className="text-[11px] font-semibold text-red-400 tracking-wider">
                   مباشر
                 </span>
               </div>
