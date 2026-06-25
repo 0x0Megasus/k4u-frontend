@@ -1,0 +1,40 @@
+import { getCategories } from "@/lib/api";
+import CategoryCard from "@/components/CategoryCard";
+
+export const dynamic = "force-dynamic";
+
+export default async function BrowsePage() {
+  const result = await getCategories();
+
+  if (!result.success) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-20 text-center">
+        <p className="text-[hsl(var(--muted-foreground))]">تعذر تحميل التصنيفات.</p>
+      </div>
+    );
+  }
+
+  const allCategories = result.data ?? [];
+  const categories = allCategories.filter((c) => c.child_count === 0);
+
+  return (
+    <div className="mx-auto max-w-7xl px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight">تصفح القنوات</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
+          جميع التصنيفات والقنوات
+        </p>
+      </div>
+
+      {categories.length === 0 ? (
+        <p className="text-[hsl(var(--muted-foreground))]">لا توجد قنوات متاحة.</p>
+      ) : (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+          {categories.map((category) => (
+            <CategoryCard key={category.id} category={category} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
