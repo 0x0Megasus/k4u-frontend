@@ -10,20 +10,11 @@ interface VideoPlayerProps {
   isLive?: boolean;
 }
 
-function formatTime(seconds: number): string {
-  if (!isFinite(seconds) || seconds < 0) return "00:00";
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-}
-
 export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const seekRef = useRef<HTMLDivElement>(null);
   const volumeRef = useRef<HTMLDivElement>(null);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isDraggingSeekRef = useRef(false);
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -31,11 +22,17 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
 
   const [playing, setPlaying] = useState(false);
   const [showLoading, setShowLoading] = useState(true);
+  const [buffering, setBuffering] = useState(false);
 
-  // Show loading overlay whenever src changes, hide once loading finishes + video starts
+  // Show loading overlay whenever src changes
   useEffect(() => {
     if (src) setShowLoading(true);
   }, [src]);
+
+  // Clear buffering state on error
+  useEffect(() => {
+    if (error) setBuffering(false);
+  }, [error]);
 
   // Hide loading when loading finishes (with brief delay for smooth transition)
   // or immediately on error
@@ -47,19 +44,10 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
       return () => clearTimeout(t);
     }
   }, [loading, error, src]);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const [muted, setMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
-  const [bufferedPercent, setBufferedPercent] = useState(0);
-  const [isDraggingSeek, setIsDraggingSeek] = useState(false);
-
-  // Keep ref in sync with dragging state for use in timeout callbacks
-  useEffect(() => {
-    isDraggingSeekRef.current = isDraggingSeek;
-  }, [isDraggingSeek]);
 
   // --- HLS logic (exactly as original) ---
   useEffect(() => {
@@ -149,22 +137,6 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
     };
   }, [src, retryCount]);
 
-  // --- Buffered progress tracking ---
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    const update = () => {
-      if (video.buffered.length > 0 && video.duration > 0) {
-        setBufferedPercent(
-          (video.buffered.end(video.buffered.length - 1) / video.duration) *
-            100,
-        );
-      }
-    };
-    video.addEventListener("progress", update);
-    return () => video.removeEventListener("progress", update);
-  }, []);
-
   // --- Controls visibility ---
   const playingRef = useRef(playing);
   useEffect(() => {
@@ -177,11 +149,9 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
       clearTimeout(hideTimerRef.current);
       hideTimerRef.current = null;
     }
-    if (playingRef.current && !isDraggingSeekRef.current) {
+    if (playingRef.current) {
       hideTimerRef.current = setTimeout(() => {
-        if (!isDraggingSeekRef.current) {
-          setControlsVisible(false);
-        }
+        setControlsVisible(false);
       }, 1500);
     }
   }, []);
@@ -195,9 +165,7 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
       clearTimeout(hideTimerRef.current);
       hideTimerRef.current = null;
     }
-    if (!isDraggingSeekRef.current) {
-      setControlsVisible(false);
-    }
+    setControlsVisible(false);
   }, []);
 
   // Keep controls visible when paused
@@ -265,16 +233,6 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
   }, []);
 
   // --- Video event handlers ---
-  const handleTimeUpdate = () => {
-    const v = videoRef.current;
-    if (v) setCurrentTime(v.currentTime);
-  };
-
-  const handleLoadedMetadata = () => {
-    const v = videoRef.current;
-    if (v) setDuration(v.duration);
-  };
-
   const handlePlay = () => setPlaying(true);
   const handlePause = () => setPlaying(false);
 
@@ -285,48 +243,6 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
       setMuted(v.muted);
     }
   };
-
-  // --- Seek ---
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    const v = videoRef.current;
-    const bar = seekRef.current;
-    if (!v || !bar) return;
-    const rect = bar.getBoundingClientRect();
-    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    v.currentTime = ratio * v.duration;
-  };
-
-  const handleSeekStart = (e: React.MouseEvent<HTMLDivElement>) => {
-    handleSeek(e);
-    setIsDraggingSeek(true);
-    showControls();
-  };
-
-  useEffect(() => {
-    if (!isDraggingSeek) return;
-    const handleMove = (e: MouseEvent) => {
-      const v = videoRef.current;
-      const bar = seekRef.current;
-      if (!v || !bar) return;
-      const rect = bar.getBoundingClientRect();
-      const ratio = Math.max(
-        0,
-        Math.min(1, (e.clientX - rect.left) / rect.width),
-      );
-      v.currentTime = ratio * v.duration;
-    };
-    const handleUp = () => {
-      setIsDraggingSeek(false);
-      showControls();
-    };
-    document.addEventListener("mousemove", handleMove);
-    document.addEventListener("mouseup", handleUp);
-    return () => {
-      document.removeEventListener("mousemove", handleMove);
-      document.removeEventListener("mouseup", handleUp);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDraggingSeek]);
 
   // --- Volume ---
   const handleVolumeClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -365,8 +281,6 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
       v.pause();
     }
   };
-
-  const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
     <div
@@ -407,16 +321,17 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
             playsInline
             webkit-playsinline="true"
             x5-playsinline="true"
-            onTimeUpdate={handleTimeUpdate}
-            onLoadedMetadata={handleLoadedMetadata}
             onPlay={handlePlay}
             onPause={handlePause}
+            onWaiting={() => setBuffering(true)}
+            onCanPlay={() => setBuffering(false)}
+            onPlaying={() => setBuffering(false)}
             onVolumeChange={handleVolumeChange}
             onClick={togglePlay}
           />
 
-          {/* Loading overlay — stays until video actually plays */}
-          {showLoading && (
+          {/* Loading overlay — initial load, re-buffering/poor connection, or glitch/retry */}
+          {(showLoading || loading || buffering) && !error && (
             <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 transition-opacity duration-300">
               <div className="flex flex-col items-center gap-5">
                 {/* Pulsing rings */}
@@ -426,7 +341,7 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
                   <div className="h-10 w-10 animate-spin rounded-full border-2 border-violet-500/30 border-t-violet-400" />
                 </div>
                 <p className="text-sm font-bold tracking-wide text-violet-300/90">
-                  جاري تحميل البث...
+                  {buffering ? "جارٍ الاتصال..." : "جاري تحميل البث..."}
                 </p>
               </div>
             </div>
@@ -480,31 +395,7 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
                 : "translate-y-3 opacity-0 pointer-events-none"
             }`}
           >
-            <div className="bg-gradient-to-t from-black/90 via-black/60 to-transparent px-3 pb-3 pt-10">
-              {/* Seek bar */}
-              <div className="mb-2">
-                <div
-                  ref={seekRef}
-                  className="group relative h-1 cursor-pointer rounded-full bg-white/20 transition-all duration-150 hover:h-[6px]"
-                  onClick={handleSeek}
-                  onMouseDown={handleSeekStart}
-                >
-                  {/* Buffered range */}
-                  <div
-                    className="absolute left-0 top-0 h-full rounded-full bg-white/30"
-                    style={{ width: `${bufferedPercent}%` }}
-                  />
-                  {/* Progress */}
-                  <div
-                    className="absolute left-0 top-0 h-full rounded-full bg-violet-500"
-                    style={{ width: `${progressPercent}%` }}
-                  >
-                    {/* Drag thumb */}
-                    <div className="absolute right-0 top-1/2 h-3 w-3 -translate-y-1/2 translate-x-1/2 rounded-full bg-violet-400 opacity-0 transition-opacity duration-150 group-hover:opacity-100" />
-                  </div>
-                </div>
-              </div>
-
+            <div className="bg-gradient-to-t from-black/90 via-black/60 to-transparent px-3 pb-3 pt-6">
               {/* Button row */}
               <div className="flex items-center gap-2">
                 {/* Play/Pause */}
@@ -519,9 +410,15 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
                   )}
                 </button>
 
-                {/* Time display */}
-                <span className="min-w-[70px] text-xs text-white/70">
-                  {formatTime(currentTime)} / {formatTime(duration)}
+                {/* Live indicator */}
+                <span className="flex items-center gap-1.5">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-red-600" />
+                  </span>
+                  <span className="text-[11px] font-extrabold tracking-wider text-red-500 drop-shadow-[0_0_6px_rgba(239,68,68,0.6)]">
+                    LIVE
+                  </span>
                 </span>
 
                 {/* Spacer */}
