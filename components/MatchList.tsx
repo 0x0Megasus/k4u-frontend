@@ -182,7 +182,7 @@ export default function MatchList({ events }: MatchListProps) {
   const pastEvents = sorted.filter((e) => isPast(e));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <p className="flex items-center justify-center gap-2 text-sm text-[hsl(var(--muted-foreground))] border-2 border-[hsl(var(--border))] bg-[hsl(var(--card))] rounded-[2px] px-4 py-3">
         <Play className="h-4 w-4 fill-[hsl(var(--muted-foreground))]" />
         اضغط على أي مباراة للمشاهدة المباشرة
