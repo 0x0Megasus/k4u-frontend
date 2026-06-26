@@ -54,7 +54,7 @@ export default function Navbar() {
         {/* Search link — navigates to /search page */}
         <Link
           href="/search"
-          className="ms-auto flex h-9 items-center gap-1.5 rounded-[2px] border-2 border-[hsl(var(--border))] px-3 text-sm font-medium text-[hsl(var(--muted-foreground))] transition-all hover:border-violet-500/30 hover:text-violet-300"
+          className="ms-auto flex h-8 sm:h-9 items-center gap-1.5 rounded-[2px] border-2 border-[hsl(var(--border))] px-3 text-sm font-medium text-[hsl(var(--muted-foreground))] transition-all hover:border-violet-500/30 hover:text-violet-300"
         >
           <Search className="h-3.5 w-3.5" />
           بحث
