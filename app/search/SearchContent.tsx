@@ -72,6 +72,16 @@ export default function SearchContent() {
         ابحث عن القنوات بالاسم
       </p>
 
+      <style>{`
+        input[type="search"]::-webkit-search-cancel-button,
+        input[type="search"]::-webkit-search-decoration {
+          display: none;
+        }
+        input[type="search"]::-ms-clear,
+        input[type="search"]::-ms-reveal {
+          display: none;
+        }
+      `}</style>
       <div className="relative mb-6">
         <SearchIcon className="absolute end-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[hsl(var(--muted-foreground))]" />
         <input
