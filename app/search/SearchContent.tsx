@@ -5,7 +5,7 @@ import { getCategories, getCategoryChannels } from "@/lib/api";
 import { Channel, Category } from "@/lib/types";
 import ChannelCard from "@/components/ChannelCard";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Search as SearchIcon } from "lucide-react";
+import { Search as SearchIcon, X } from "lucide-react";
 
 export default function SearchContent() {
   const searchParams = useSearchParams();
@@ -86,8 +86,20 @@ export default function SearchContent() {
           }}
           placeholder="ابحث عن القنوات..."
           autoFocus
-          className="h-11 w-full rounded-[2px] border-2 border-[hsl(var(--border))] bg-[hsl(var(--card))] ps-9 pe-3 text-sm outline-none transition-all placeholder:text-[hsl(var(--muted-foreground))] focus:border-violet-500/40"
+          className="h-11 w-full rounded-[2px] border-2 border-[hsl(var(--border))] bg-[hsl(var(--card))] ps-9 pe-10 text-sm outline-none transition-all placeholder:text-[hsl(var(--muted-foreground))] focus:border-violet-500/40"
         />
+        {query.trim() && (
+          <button
+            onClick={() => {
+              setQuery("");
+              router.replace("/search", { scroll: false });
+            }}
+            className="absolute start-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-[2px] text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--muted))]/20 hover:text-[hsl(var(--foreground))]"
+            aria-label="مسح البحث"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
       {query.trim() && (

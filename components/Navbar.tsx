@@ -1,22 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Search, Menu } from "lucide-react";
 
 export default function Navbar() {
-  const router = useRouter();
   const pathname = usePathname();
-  const [searchQuery, setSearchQuery] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-    }
-  };
 
   const navLinks = [
     { href: "/", label: "المباريات" },
@@ -60,19 +51,13 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Search */}
-        <div className="ms-auto">
-          <form onSubmit={handleSearch} className="relative">
-            <Search className="absolute end-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[hsl(var(--muted-foreground))]" />
-            <input
-              type="search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="ابحث عن القنوات..."
-              className="h-9 w-40 rounded-[2px] border-2 border-[hsl(var(--border))] bg-[hsl(var(--card))] ps-8 pe-3 text-sm outline-none transition-all placeholder:text-[hsl(var(--muted-foreground))] focus:w-48 focus:border-violet-500/40 lg:w-48"
-            />
-          </form>
-        </div>
+        {/* Search link — navigates to /search page */}
+        <Link
+          href="/search"
+          className="ms-auto flex h-9 w-9 items-center justify-center rounded-[2px] border-2 border-[hsl(var(--border))] text-[hsl(var(--muted-foreground))] transition-all hover:border-violet-500/30 hover:text-violet-300"
+        >
+          <Search className="h-3.5 w-3.5" />
+        </Link>
 
         {/* Mobile menu button */}
         <button
