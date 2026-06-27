@@ -18,11 +18,6 @@ function formatTime(unix: number): string {
   return `${String(h12).padStart(2, "0")}:${String(m).padStart(2, "0")} ${isPM ? "PM" : "AM"}`;
 }
 
-function formatDate(unix: number): string {
-  const d = new Date(unix * 1000);
-  return d.toLocaleDateString("ar-EG-u-nu-latn", { month: "short", day: "numeric" });
-}
-
 function isLive(event: MatchEvent): boolean {
   const now = Math.floor(Date.now() / 1000);
   return now >= event.start_time && now <= event.end_time;
@@ -127,11 +122,7 @@ function MatchCard({ event }: { event: MatchEvent }) {
               <span className="text-xs font-bold tabular-nums tracking-tight text-[hsl(var(--muted-foreground))]">
                 {formatTime(event.start_time)}
               </span>
-              {formatDate(event.start_time) !== formatDate(event.end_time) && (
-                <span className="text-[10px] text-[hsl(var(--muted-foreground))/60]">
-                  {formatDate(event.start_time)}
-                </span>
-              )}
+
             </div>
           )}
         </div>
