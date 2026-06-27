@@ -101,7 +101,8 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
 
           if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
             if (data.details === "manifestParsingError") {
-              setError("هذا البث غير متاح");
+              // HLS playlist is not valid M3U8 (e.g. old proxy served HTML as stream)
+              setError("عذراً، هذا البث غير متاح حالياً. القناة قد لا تكون متوفرة.");
             } else if (data.details === "manifestLoadError") {
               // Retry manifest loading with bounded backoff
               if (manifestRetries < MAX_MANIFEST_RETRIES) {
@@ -110,7 +111,7 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
                 setTimeout(() => hls?.startLoad(), delay);
               } else {
                 // Backend returned an error (e.g. 502 for unresolvable URL)
-                setError("هذا البث غير متاح");
+                setError("عذراً، هذا البث غير متاح حالياً. القناة قد لا تكون متوفرة.");
               }
             } else {
               // Other network errors: bounded retry
@@ -118,7 +119,7 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
                 manifestRetries++;
                 setTimeout(() => hls?.startLoad(), 1000);
               } else {
-                setError("فشل الاتصال بالبث");
+                setError("تعذر الاتصال بخادم البث. يرجى المحاولة مرة أخرى لاحقاً.");
               }
             }
           } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
@@ -126,7 +127,7 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
               recoveryAttempts++;
               hls?.recoverMediaError();
             } else {
-              setRetryCount((c) => c + 1);
+              setError("حدث خطأ في تشغيل البث. يرجى إعادة تحميل الصفحة.");
             }
           } else {
             setError(
@@ -367,21 +368,31 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
 
           {/* Error overlay */}
           {error && (
-            <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-2 bg-black/80 p-4 text-center">
-              <svg
-                className="h-6 w-6 text-red-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.5}
+            <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-black/85 p-6 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500/20">
+                <svg
+                  className="h-6 w-6 text-red-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+                  />
+                </svg>
+              </div>
+              <p className="text-sm font-semibold leading-relaxed text-red-300 max-w-xs">
+                {error}
+              </p>
+              <button
+                onClick={() => { setError(null); setRetryCount((c) => c + 1); }}
+                className="mt-1 rounded-[2px] border border-red-500/30 bg-red-500/10 px-4 py-1.5 text-xs font-bold text-red-300 transition-colors hover:bg-red-500/20"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
-                />
-              </svg>
-              <p className="text-xs text-red-300">{error}</p>
+                إعادة المحاولة
+              </button>
             </div>
           )}
 
