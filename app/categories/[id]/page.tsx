@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { getCategoryChannels } from "@/lib/api";
 import ChannelCard from "@/components/ChannelCard";
 import { notFound } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -42,6 +44,13 @@ export default async function CategoryPage({
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
+      <Link
+        href="/browse"
+        className="mb-4 inline-flex items-center gap-1.5 text-xs text-[hsl(var(--muted-foreground))] transition-colors hover:text-[hsl(var(--foreground))]"
+      >
+        <ArrowLeft className="h-3.5 w-3.5" />
+        جميع القنوات
+      </Link>
       <h1 className="mb-8 text-2xl font-bold tracking-tight">القنوات</h1>
 
       {channels.length === 0 ? (
