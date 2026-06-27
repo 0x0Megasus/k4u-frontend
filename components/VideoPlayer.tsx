@@ -62,6 +62,8 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
 
     let hls: Hls | null = null;
     let recoveryAttempts = 0;
+    let manifestRetries = 0;
+    const MAX_MANIFEST_RETRIES = 3;
 
     const handleCanPlay = () => setLoading(false);
     const handleError = () => {
@@ -100,8 +102,23 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
           if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
             if (data.details === "manifestParsingError") {
               setError("هذا البث غير متاح");
+            } else if (data.details === "manifestLoadError") {
+              // Retry manifest loading with bounded backoff
+              if (manifestRetries < MAX_MANIFEST_RETRIES) {
+                manifestRetries++;
+                const delay = manifestRetries * 1500;
+                setTimeout(() => hls?.startLoad(), delay);
+              } else {
+                setRetryCount((c) => c + 1);
+              }
             } else {
-              hls?.startLoad();
+              // Other network errors: bounded retry via startLoad
+              if (manifestRetries < MAX_MANIFEST_RETRIES) {
+                manifestRetries++;
+                setTimeout(() => hls?.startLoad(), 1000);
+              } else {
+                setRetryCount((c) => c + 1);
+              }
             }
           } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
             if (recoveryAttempts < 3) {
