@@ -109,15 +109,16 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
                 const delay = manifestRetries * 1500;
                 setTimeout(() => hls?.startLoad(), delay);
               } else {
-                setRetryCount((c) => c + 1);
+                // Backend returned an error (e.g. 502 for unresolvable URL)
+                setError("هذا البث غير متاح");
               }
             } else {
-              // Other network errors: bounded retry via startLoad
+              // Other network errors: bounded retry
               if (manifestRetries < MAX_MANIFEST_RETRIES) {
                 manifestRetries++;
                 setTimeout(() => hls?.startLoad(), 1000);
               } else {
-                setRetryCount((c) => c + 1);
+                setError("فشل الاتصال بالبث");
               }
             }
           } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
