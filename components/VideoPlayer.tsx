@@ -49,6 +49,15 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
 
+  // Detect small screens (< 1024px = tablet/phone)
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+  useEffect(() => {
+    const check = () => setIsSmallScreen(window.innerWidth < 1024);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
   // --- HLS logic (exactly as original) ---
   useEffect(() => {
     const video = videoRef.current;
@@ -162,6 +171,8 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
     playingRef.current = playing;
   }, [playing]);
 
+  const hideTimeout = isSmallScreen ? 800 : 1500;
+
   const showControls = useCallback(() => {
     setControlsVisible(true);
     if (hideTimerRef.current) {
@@ -171,9 +182,9 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
     if (playingRef.current) {
       hideTimerRef.current = setTimeout(() => {
         setControlsVisible(false);
-      }, 1500);
+      }, hideTimeout);
     }
-  }, []);
+  }, [hideTimeout]);
 
   const handleMouseMove = useCallback(() => {
     showControls();
@@ -189,14 +200,14 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
 
   // Keep controls visible when paused
   useEffect(() => {
-    if (!playing) {
+    if (!playing && !isSmallScreen) {
       setControlsVisible(true);
       if (hideTimerRef.current) {
         clearTimeout(hideTimerRef.current);
         hideTimerRef.current = null;
       }
     }
-  }, [playing]);
+  }, [playing, isSmallScreen]);
 
   // Cleanup timer on unmount
   useEffect(() => {
@@ -301,13 +312,22 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
     }
   };
 
+  // On small screens: tap video shows controls (never toggles play/pause)
+  const handleVideoClick = useCallback(() => {
+    if (isSmallScreen) {
+      showControls();
+    } else {
+      togglePlay();
+    }
+  }, [isSmallScreen, showControls]);
+
   return (
     <div
       ref={containerRef}
       className={`relative w-full overflow-hidden ${
          isFullscreen ? "!border-0" : "border-2 border-[hsl(var(--border))]"
        } rounded-[2px] bg-black ${
-         !controlsVisible && playing ? "cursor-none" : ""
+         !controlsVisible && playing && !isSmallScreen ? "cursor-none" : ""
        } ${isFullscreen ? "h-screen" : "aspect-video"}`}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
@@ -346,7 +366,7 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
             onCanPlay={() => setBuffering(false)}
             onPlaying={() => setBuffering(false)}
             onVolumeChange={handleVolumeChange}
-            onClick={togglePlay}
+            onClick={handleVideoClick}
           />
 
           {/* Loading overlay — initial load, re-buffering/poor connection, or glitch/retry */}
@@ -404,8 +424,8 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
             </div>
           )}
 
-          {/* Center play overlay when paused */}
-          {!showLoading && !error && !playing && (
+          {/* Center play overlay when paused (desktop only) */}
+          {!isSmallScreen && !showLoading && !error && !playing && (
             <div
               className="absolute inset-0 z-10 flex cursor-pointer items-center justify-center"
               onClick={togglePlay}
@@ -419,7 +439,7 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
           {/* Bottom controls bar */}
           <div
             className={`absolute bottom-0 left-0 right-0 z-20 transition-all duration-300 ease-in-out ${
-              controlsVisible || !playing
+              controlsVisible || (!isSmallScreen && !playing)
                 ? "translate-y-0 opacity-100"
                 : "translate-y-3 opacity-0 pointer-events-none"
             }`}
