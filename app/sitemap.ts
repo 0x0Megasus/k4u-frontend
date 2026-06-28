@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
+import { BASE_URL } from "@/lib/seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://www.livekoora.watch";
+  const baseUrl = BASE_URL;
 
   return [
     {
