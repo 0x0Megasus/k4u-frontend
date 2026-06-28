@@ -38,16 +38,18 @@ export default async function BrowsePage() {
   }
 
   const allCategories = result.data ?? [];
-  const categories = allCategories.filter((c) => c.child_count === 0);
+  const categories = allCategories.filter(
+    (c) => c.child_count === 0 && c.name?.toLowerCase().includes("bein")
+  );
 
   return (
     <>
       <JsonLd data={breadcrumbSchema} />
       <div className="mx-auto max-w-7xl px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">جميع قنوات البث المباشر</h1>
+          <h1 className="text-3xl font-bold tracking-tight">قنوات beIN SPORTS</h1>
           <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-            تصفح القنوات المتاحة لمشاهدة مباريات اليوم بث مباشر
+            تصفح قنوات بي إن سبورت المتاحة لمشاهدة مباريات اليوم بث مباشر
           </p>
         </div>
 
