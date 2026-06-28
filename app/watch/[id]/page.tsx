@@ -73,9 +73,26 @@ export default async function WatchPage({
     ],
   };
 
+  const broadcastSchema: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "BroadcastService",
+    name: channelName,
+    provider: {
+      "@type": "Organization",
+      name: "Live Koora",
+      url: BASE_URL,
+    },
+  };
+  if (channelLogo) {
+    broadcastSchema.image = channelLogo.startsWith("http")
+      ? channelLogo
+      : `${BASE_URL}${channelLogo}`;
+  }
+
   return (
     <>
       <JsonLd data={breadcrumbSchema} />
+      <JsonLd data={broadcastSchema} />
       <WatchContent
         sources={result.data}
         channelName={channelName}

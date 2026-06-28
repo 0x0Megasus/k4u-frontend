@@ -81,9 +81,30 @@ export default async function EventWatchPage({
     ],
   };
 
+  const eventSchema: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "SportsEvent",
+    name: sp?.t1 && sp?.t2
+      ? `${sp.ch ? sp.ch + " — " : ""}${sp.t1} vs ${sp.t2}`
+      : sp?.ch || "مباراة",
+    ...(sp?.st && {
+      startDate: new Date(parseInt(sp.st, 10) * 1000).toISOString(),
+    }),
+    ...(sp?.et && {
+      endDate: new Date(parseInt(sp.et, 10) * 1000).toISOString(),
+    }),
+  };
+  if (sp?.t1 || sp?.t2) {
+    eventSchema.competitor = [
+      ...(sp?.t1 ? [{ "@type": "SportsTeam" as const, name: sp.t1 }] : []),
+      ...(sp?.t2 ? [{ "@type": "SportsTeam" as const, name: sp.t2 }] : []),
+    ];
+  }
+
   return (
     <>
       <JsonLd data={breadcrumbSchema} />
+      <JsonLd data={eventSchema} />
       <EventWatchContent
         sources={result.data}
         team1={sp?.t1 || ""}
