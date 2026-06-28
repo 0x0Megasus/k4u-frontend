@@ -1,5 +1,7 @@
 import { getStreamSources } from "@/lib/api";
 import WatchContent from "./WatchContent";
+import { JsonLd } from "@/components/JsonLd";
+import { buildSocialMetadata, BASE_URL } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
@@ -14,13 +16,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const sp = await searchParams;
-  const title = sp?.name
-    ? `${sp.name} — koora4you`
-    : `Channel ${id} — koora4you`;
-  return {
-    title,
-    description: "Watch live TV streaming",
-  };
+  const channelName = sp?.name || `القناة ${id}`;
+  return buildSocialMetadata({
+    title: `${channelName} — بث مباشر | Live Koora`,
+    description: `شاهد ${channelName} بث مباشر HD. مشاهدة قنوات كرة القدم اليوم live football streaming على Live Koora.`,
+    path: `/watch/${id}`,
+  });
 }
 
 export default async function WatchPage({
@@ -58,11 +59,28 @@ export default async function WatchPage({
   const channelName = sp?.name || `Channel ${channelId}`;
   const channelLogo = sp?.logo || "";
 
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Live Koora", item: BASE_URL },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: channelName,
+        item: `${BASE_URL}/watch/${id}`,
+      },
+    ],
+  };
+
   return (
-    <WatchContent
-      sources={result.data}
-      channelName={channelName}
-      channelLogo={channelLogo}
-    />
+    <>
+      <JsonLd data={breadcrumbSchema} />
+      <WatchContent
+        sources={result.data}
+        channelName={channelName}
+        channelLogo={channelLogo}
+      />
+    </>
   );
 }
