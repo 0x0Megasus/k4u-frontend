@@ -27,7 +27,7 @@ export default function Navbar() {
     alt=""
     width={32}
     height={32}
-    className="h-8 w-8"
+    className="h-8 w-8 rounded-full"
   />
           Live Koora
         </Link>
