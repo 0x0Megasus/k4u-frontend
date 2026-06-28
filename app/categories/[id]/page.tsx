@@ -15,9 +15,10 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
+  const categoryId = parseInt(id, 10);
   const catsResult = await getCategories();
   const categoryName =
-    catsResult.data?.find((c) => String(c.id) === id)?.name ?? id;
+    catsResult.data?.find((c) => c.id === categoryId)?.name ?? "القنوات";
   return buildSocialMetadata({
     title: `${categoryName} — بث مباشر | Live Koora`,
     description: `شاهد قنوات ${categoryName} بث مباشر HD. مشاهدة مباريات اليوم كورة لايف بدون تقطيع.`,
