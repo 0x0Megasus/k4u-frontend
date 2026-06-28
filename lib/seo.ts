@@ -27,8 +27,10 @@ export function buildSocialMetadata({
   ogType = "website",
   noindex = false,
 }: SEOProps): Metadata {
-  const pageUrl = `${BASE_URL}${path}`;
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  const pageUrl = `${BASE_URL}${normalizedPath}`;
   const imageUrl = ogImage.startsWith("http") ? ogImage : `${BASE_URL}${ogImage}`;
+  const secureImageUrl = imageUrl.replace(/^http:/, "https:");
 
   return {
     title,
@@ -47,7 +49,7 @@ export function buildSocialMetadata({
       images: [
         {
           url: imageUrl,
-          secureUrl: imageUrl,
+          secureUrl: secureImageUrl,
           width: 1200,
           height: 630,
           alt: ogImageAlt,
@@ -59,7 +61,7 @@ export function buildSocialMetadata({
       card: "summary_large_image",
       title,
       description,
-      images: [imageUrl],
+      images: [{ url: imageUrl, alt: ogImageAlt }],
     },
     ...(noindex ? { robots: { index: false, follow: true } } : {}),
   };
