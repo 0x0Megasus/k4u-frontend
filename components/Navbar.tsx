@@ -22,11 +22,13 @@ export default function Navbar() {
           href="/"
           className="flex items-center gap-2 font-bold text-lg tracking-tight transition-opacity hover:opacity-80 flex-shrink-0"
         >
-          <img
-            src="/android-chrome-192x192.png"
-            alt="Live Koora"
-            className="h-8 w-8"
-          />
+  <img
+    src="/android-chrome-192x192.png"
+    alt=""
+    width={32}
+    height={32}
+    className="h-8 w-8"
+  />
           Live Koora
         </Link>
 
