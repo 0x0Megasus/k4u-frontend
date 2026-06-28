@@ -39,7 +39,9 @@ export default async function BrowsePage() {
 
   const allCategories = result.data ?? [];
   const categories = allCategories.filter(
-    (c) => c.child_count === 0 && c.name?.toLowerCase().includes("bein")
+    (c) =>
+      c.child_count === 0 &&
+      c.name?.toLowerCase().includes("bein sports (")
   );
 
   return (
