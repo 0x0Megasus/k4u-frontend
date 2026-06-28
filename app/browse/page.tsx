@@ -1,7 +1,30 @@
 import { getCategories } from "@/lib/api";
 import CategoryCard from "@/components/CategoryCard";
+import { JsonLd } from "@/components/JsonLd";
+import { buildSocialMetadata, BASE_URL } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
+
+export const metadata = buildSocialMetadata({
+  title: "جميع قنوات البث المباشر — Live Koora",
+  description:
+    "تصفح جميع قنوات البث المباشر الرياضية. قنوات HD لمشاهدة مباريات اليوم كورة لايف بث مباشر بدون تقطيع.",
+  path: "/browse",
+});
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Live Koora", item: BASE_URL },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "القنوات",
+      item: `${BASE_URL}/browse`,
+    },
+  ],
+};
 
 export default async function BrowsePage() {
   const result = await getCategories();
@@ -18,23 +41,26 @@ export default async function BrowsePage() {
   const categories = allCategories.filter((c) => c.child_count === 0);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">تصفح القنوات</h1>
-        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-          جميع التصنيفات والقنوات
-        </p>
-      </div>
-
-      {categories.length === 0 ? (
-        <p className="text-[hsl(var(--muted-foreground))]">لا توجد قنوات متاحة.</p>
-      ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-          {categories.map((category) => (
-            <CategoryCard key={category.id} category={category} />
-          ))}
+    <>
+      <JsonLd data={breadcrumbSchema} />
+      <div className="mx-auto max-w-7xl px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold tracking-tight">جميع قنوات البث المباشر</h1>
+          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
+            تصفح القنوات المتاحة لمشاهدة مباريات اليوم بث مباشر
+          </p>
         </div>
-      )}
-    </div>
+
+        {categories.length === 0 ? (
+          <p className="text-[hsl(var(--muted-foreground))]">لا توجد قنوات متاحة.</p>
+        ) : (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+            {categories.map((category) => (
+              <CategoryCard key={category.id} category={category} />
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   );
 }
