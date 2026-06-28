@@ -10,8 +10,8 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const navLinks = [
-    { href: "/", label: "المباريات" },
-    { href: "/browse", label: "جميع القنوات" },
+    { href: "/", label: "مباريات اليوم" },
+    { href: "/browse", label: "القنوات" },
   ];
 
   return (
@@ -22,16 +22,12 @@ export default function Navbar() {
           href="/"
           className="flex items-center gap-2 font-bold text-lg tracking-tight transition-opacity hover:opacity-80 flex-shrink-0"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-[2px] border-2 border-violet-500 bg-violet-500/10">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-4 w-4 text-violet-400">
-              <circle cx="12" cy="12" r="9" />
-              <path d="M12 3a9 9 0 0 1 9 9" />
-              <path d="M12 3a9 9 0 0 0-9 9" />
-              <path d="M3 12h18" />
-              <path d="M12 3v18" />
-            </svg>
-          </div>
-          koora4you
+          <img
+            src="/android-chrome-192x192.png"
+            alt="Live Koora"
+            className="h-8 w-8"
+          />
+          Live Koora
         </Link>
 
         {/* Desktop nav links */}
