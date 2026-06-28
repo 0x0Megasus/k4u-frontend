@@ -49,7 +49,7 @@ export default async function BrowsePage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight">قنوات beIN SPORTS</h1>
           <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-            تصفح قنوات بي إن سبورت المتاحة لمشاهدة مباريات اليوم بث مباشر
+            تصفح قنوات بي إن سبورت المتاحة لمشاهدة مباريات اليوم مباشرة
           </p>
         </div>
 
