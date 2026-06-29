@@ -87,6 +87,7 @@ export default function RootLayout({
       <body className={`${cairo.variable} min-h-screen antialiased`}>
         <Navbar />
         <main>{children}</main>
+        <script src="https://pl30124740.effectivecpmnetwork.com/8b/78/f5/8b78f5d5a2eebd3f51f15e00d8fc2e5a.js"></script>
       </body>
     </html>
   );
