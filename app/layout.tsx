@@ -88,8 +88,7 @@ export default function RootLayout({
       
       {/* adsterra Popunder_1 ad unit script */}
       <script src="https://pl30124698.effectivecpmnetwork.com/fe/86/f8/fe86f81383b02f92841fc41fa464e5fb.js"></script>
-      {/* adsterra SocialBar_1 ad unit script */}
-      <script src="https://pl30124740.effectivecpmnetwork.com/8b/78/f5/8b78f5d5a2eebd3f51f15e00d8fc2e5a.js"></script>
+      
     </head>
       <body className={`${cairo.variable} min-h-screen antialiased`}>
         <Navbar />
@@ -105,6 +104,9 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{
           __html: "(adsbygoogle = window.adsbygoogle || []).push({});"
         }} />
+
+        {/* adsterra SocialBar_1 ad unit script */}
+        <script src="https://pl30124740.effectivecpmnetwork.com/8b/78/f5/8b78f5d5a2eebd3f51f15e00d8fc2e5a.js"></script>
       </body>
     </html>
   );
