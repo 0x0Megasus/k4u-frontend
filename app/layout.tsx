@@ -83,11 +83,26 @@ export default function RootLayout({
     <html lang="ar" dir="rtl" className="dark">
     <head>
       <meta name="google-adsense-account" content="ca-pub-4441418851071523"></meta>
+      {/* google ads script */}
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4441418851071523" crossOrigin="anonymous"></script>
+      
       <script src="https://pl30124698.effectivecpmnetwork.com/fe/86/f8/fe86f81383b02f92841fc41fa464e5fb.js"></script>
     </head>
       <body className={`${cairo.variable} min-h-screen antialiased`}>
         <Navbar />
         <main>{children}</main>
+
+        {/* display ad unit_001 */}
+        <ins className="adsbygoogle"
+             style={{ display: "block" }}
+             data-ad-client="ca-pub-4441418851071523"
+             data-ad-slot="8436459990"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script dangerouslySetInnerHTML={{
+          __html: "(adsbygoogle = window.adsbygoogle || []).push({});"
+        }} />
+
         <script data-cfasync="false" src="https://pl30124741.effectivecpmnetwork.com/346b88946a8224be353937d5f52a2631/invoke.js"></script>
         <div id="container-346b88946a8224be353937d5f52a2631"></div>
       </body>
