@@ -104,9 +104,6 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{
           __html: "(adsbygoogle = window.adsbygoogle || []).push({});"
         }} />
-
-        {/* adsterra SocialBar_1 ad unit script */}
-        <script src="https://pl30124740.effectivecpmnetwork.com/8b/78/f5/8b78f5d5a2eebd3f51f15e00d8fc2e5a.js"></script>
       </body>
     </html>
   );
