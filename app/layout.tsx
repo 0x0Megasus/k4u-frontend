@@ -94,13 +94,14 @@ export default function RootLayout({
         <Navbar />
         <main>{children}</main>
 
-        {/* display ad unit_001 */}
+        {/* display ad unit_001 — suppressHydrationWarning because AdSense mutates the DOM before hydration */}
         <ins className="adsbygoogle"
              style={{ display: "block" }}
              data-ad-client="ca-pub-4441418851071523"
              data-ad-slot="8436459990"
              data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
+             data-full-width-responsive="true"
+             suppressHydrationWarning></ins>
         <script dangerouslySetInnerHTML={{
           __html: "(adsbygoogle = window.adsbygoogle || []).push({});"
         }} />
