@@ -26,19 +26,19 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
 
   // Show loading overlay whenever src changes
   useEffect(() => {
-    if (src) setShowLoading(true);
+    if (src) queueMicrotask(() => setShowLoading(true));
   }, [src]);
 
   // Clear buffering state on error
   useEffect(() => {
-    if (error) setBuffering(false);
+    if (error) queueMicrotask(() => setBuffering(false));
   }, [error]);
 
   // Hide loading when loading finishes (with brief delay for smooth transition)
   // or immediately on error
   useEffect(() => {
     if (error) {
-      setShowLoading(false);
+      queueMicrotask(() => setShowLoading(false));
     } else if (!loading && src) {
       const t = setTimeout(() => setShowLoading(false), 400);
       return () => clearTimeout(t);
@@ -77,7 +77,7 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
     const handleCanPlay = () => setLoading(false);
     const handleError = () => {
       setLoading(false);
-      setError("تعذر تحميل البث");
+      setError("تعذر تشغيل البث حالياً.");
     };
 
     const isHls =
@@ -113,7 +113,7 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
           if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
             if (data.details === "manifestParsingError") {
               // HLS playlist is not valid M3U8 (e.g. old proxy served HTML as stream)
-              setError("عذراً، هذا البث غير متاح حالياً. القناة قد لا تكون متوفرة.");
+              setError("مصدر البث غير متاح حالياً.");
             } else if (data.details === "manifestLoadError") {
               // Retry manifest loading with bounded backoff
               if (manifestRetries < MAX_MANIFEST_RETRIES) {
@@ -122,7 +122,7 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
                 setTimeout(() => hls?.startLoad(), delay);
               } else {
                 // Backend returned an error (e.g. 502 for unresolvable URL)
-                setError("عذراً، هذا البث غير متاح حالياً. القناة قد لا تكون متوفرة.");
+                setError("مصدر البث غير متاح حالياً.");
               }
             } else {
               // Other network errors: bounded retry
@@ -130,7 +130,7 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
                 manifestRetries++;
                 setTimeout(() => hls?.startLoad(), 1000);
               } else {
-                setError("تعذر الاتصال بخادم البث. يرجى المحاولة مرة أخرى لاحقاً.");
+                setError("انقطع الاتصال بمصدر البث. حاول مرة أخرى بعد قليل.");
               }
             }
           } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
@@ -138,11 +138,11 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
               recoveryAttempts++;
               hls?.recoverMediaError();
             } else {
-              setError("حدث خطأ في تشغيل البث. يرجى إعادة تحميل الصفحة.");
+            setError("حدث خطأ أثناء التشغيل. جرّب إعادة تحميل الصفحة.");
             }
           } else {
             setError(
-              data.details ? `خطأ: ${data.details}` : "فشل تشغيل البث",
+              data.details ? `خطأ: ${data.details}` : "تعذر تشغيل البث.",
             );
           }
         });
@@ -152,7 +152,7 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
         video.addEventListener("error", handleError);
       } else {
         setLoading(false);
-        setError("تشغيل HLS غير مدعوم في هذا المتصفح");
+        setError("هذا المتصفح لا يدعم تشغيل هذا النوع من البث.");
       }
     } else {
       video.src = src;
@@ -203,7 +203,7 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
   // Keep controls visible when paused
   useEffect(() => {
     if (!playing && !isSmallScreen) {
-      setControlsVisible(true);
+      queueMicrotask(() => setControlsVisible(true));
       if (hideTimerRef.current) {
         clearTimeout(hideTimerRef.current);
         hideTimerRef.current = null;
@@ -350,7 +350,7 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
             />
           </svg>
           <p className="text-sm font-bold text-[hsl(var(--muted-foreground))]">
-            لا يوجد بث متاح
+            لا يتوفر بث حالياً
           </p>
         </div>
       ) : (
@@ -382,7 +382,7 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
                   <div className="h-10 w-10 animate-spin rounded-full border-2 border-violet-500/30 border-t-violet-400" />
                 </div>
                 <p className="text-sm font-bold tracking-wide text-violet-300/90">
-                  {buffering ? "جارٍ الاتصال..." : "جاري تحميل البث..."}
+                  {buffering ? "جارٍ الاتصال..." : "جارٍ تجهيز البث..."}
                 </p>
               </div>
             </div>
@@ -413,7 +413,7 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
                 onClick={() => { setError(null); setRetryCount((c) => c + 1); }}
                 className="mt-1 rounded-[2px] border border-red-500/30 bg-red-500/10 px-4 py-1.5 text-xs font-bold text-red-300 transition-colors hover:bg-red-500/20"
               >
-                إعادة المحاولة
+                حاول مرة أخرى
               </button>
             </div>
           )}

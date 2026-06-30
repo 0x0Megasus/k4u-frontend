@@ -66,7 +66,6 @@ function LogoImg({
 function MatchCard({ event }: { event: MatchEvent }) {
   const router = useRouter();
   const live = isLive(event);
-  const past = isPast(event);
 
   const handleClick = () => {
     const params = new URLSearchParams({
@@ -143,7 +142,7 @@ function MatchCard({ event }: { event: MatchEvent }) {
       <div className="mt-3 flex items-center justify-center gap-2 border-t-2 border-[hsl(var(--border))] pt-3">
         <span className="inline-flex items-center gap-2 rounded-[2px] border-2 border-violet-500/30 bg-violet-500/5 px-4 py-1.5 text-sm font-bold text-violet-400 transition-all hover:border-violet-500 hover:bg-violet-500/10">
           <Play className="h-4 w-4 fill-violet-400" />
-          شاهد
+          مشاهدة
         </span>
       </div>
 
@@ -176,7 +175,7 @@ export default function MatchList({ events }: MatchListProps) {
     <div className="space-y-8">
       <p className="flex items-center justify-center gap-2 text-sm text-[hsl(var(--muted-foreground))] border-2 border-[hsl(var(--border))] bg-[hsl(var(--card))] rounded-[2px] px-4 py-3">
         <Play className="h-4 w-4 fill-[hsl(var(--muted-foreground))]" />
-        اضغط على أي مباراة للمشاهدة المباشرة
+        اختر مباراة لفتح صفحة المشاهدة.
       </p>
       {liveEvents.length > 0 && (
         <section>
@@ -194,7 +193,7 @@ export default function MatchList({ events }: MatchListProps) {
       {upcomingEvents.length > 0 && (
         <section>
           <h2 className="mb-4 inline-block rounded-[2px] border-2 border-violet-500/20 bg-violet-500/5 px-3 py-1 text-sm font-bold tracking-wider text-violet-300">
-            لم تبدأ بعد
+            مباريات قادمة
           </h2>
           <div className="space-y-2">
             {upcomingEvents.map((ev) => (
@@ -207,7 +206,7 @@ export default function MatchList({ events }: MatchListProps) {
       {pastEvents.length > 0 && (
         <section>
           <h2 className="mb-3 text-sm font-semibold tracking-wider text-[hsl(var(--muted-foreground))/50]">
-            انتهت ...
+            مباريات انتهت
           </h2>
           <div className="space-y-2 opacity-50">
             {pastEvents.map((ev) => (

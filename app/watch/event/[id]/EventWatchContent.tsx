@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import VideoPlayer from "@/components/VideoPlayer";
 import Link from "next/link";
 import { ArrowLeft, Trophy, Swords, Clock, Wifi, WifiLow } from "lucide-react";
@@ -69,19 +69,14 @@ export default function EventWatchContent({
 }: EventWatchContentProps) {
   // SSR-safe: filter low quality during render
   const filtered = useMemo(() => filterQualities(sources), [sources]);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-
-  // Client-only: auto-select based on connection speed after mount
-  useEffect(() => {
-    setSelectedIndex(autoSelectIndex(filtered));
-  }, [filtered]);
+  const [selectedIndex, setSelectedIndex] = useState(() => autoSelectIndex(filtered));
 
   const currentSource = filtered[selectedIndex] ?? filtered[0] ?? null;
   const streamUrl = currentSource
     ? getStreamProxyUrl(currentSource.token)
     : "";
 
-  const now = Math.floor(Date.now() / 1000);
+  const [now] = useState(() => Math.floor(Date.now() / 1000));
   const live = now >= startTime && now <= endTime;
   const upcoming = !live && now < startTime;
 
@@ -92,7 +87,7 @@ export default function EventWatchContent({
         className="mb-4 inline-flex items-center gap-1.5 text-xs text-[hsl(var(--muted-foreground))] transition-colors hover:text-[hsl(var(--foreground))]"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
-        المباريات
+        مباريات اليوم
       </Link>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
@@ -145,7 +140,7 @@ export default function EventWatchContent({
               <div className="flex items-center gap-2">
                 <Clock className="h-3.5 w-3.5 text-[hsl(var(--muted-foreground))]" />
                 <span className="text-[11px] font-semibold text-[hsl(var(--muted-foreground))] tracking-wider">
-                  يبدأ في {formatTime(startTime)}
+                  موعد البداية: {formatTime(startTime)}
                 </span>
               </div>
             )}
@@ -155,7 +150,7 @@ export default function EventWatchContent({
           {filtered.length > 1 && (
             <div>
               <p className="mb-2 text-[10px] font-semibold tracking-widest text-[hsl(var(--muted-foreground))]">
-                الجودة
+                جودة البث
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {filtered.map((source, i) => (
@@ -187,7 +182,7 @@ export default function EventWatchContent({
             <div className="flex items-center gap-2">
               <Trophy className="h-4 w-4 text-amber-400" />
               <h2 className="text-[10px] font-semibold tracking-widest text-[hsl(var(--muted-foreground))]">
-                تفاصيل المباراة
+                معلومات المباراة
               </h2>
             </div>
             <div className="mt-3 space-y-2">
@@ -223,7 +218,7 @@ export default function EventWatchContent({
                 )}
                 {upcoming && (
                   <p className="text-xs text-[hsl(var(--muted-foreground))]">
-                    يبدأ في {formatTime(startTime)}
+                    موعد البداية: {formatTime(startTime)}
                   </p>
                 )}
               </div>
@@ -232,7 +227,7 @@ export default function EventWatchContent({
               {filtered.length > 0 && live && (
                 <div className="pt-2 border-t-2 border-[hsl(var(--border))]">
                   <p className="text-[10px] font-semibold tracking-widest text-[hsl(var(--muted-foreground))]">
-                    الجودة
+                    جودة البث
                   </p>
                   <div className="mt-1 space-y-1">
                     {filtered.map((s, i) => (

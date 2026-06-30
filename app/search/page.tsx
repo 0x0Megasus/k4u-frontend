@@ -4,9 +4,9 @@ import { buildSocialMetadata, BASE_URL } from "@/lib/seo";
 import { JsonLd } from "@/components/JsonLd";
 
 export const metadata = buildSocialMetadata({
-  title: "بحث — Live Koora",
+  title: "البحث عن قناة",
   description:
-    "ابحث عن مباريات اليوم بث مباشر، نتائج المباريات، وجدول المباريات. اكتشف فرقك المفضلة وتابع البطولات العربية والعالمية على Live Koora.",
+    "ابحث بسرعة عن القنوات الرياضية المتاحة داخل Live Koora.",
   path: "/search",
   noindex: true,
 });

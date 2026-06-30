@@ -3,6 +3,7 @@ import EventWatchContent from "./EventWatchContent";
 import { JsonLd } from "@/components/JsonLd";
 import { buildSocialMetadata, BASE_URL } from "@/lib/seo";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -17,15 +18,15 @@ export async function generateMetadata({
   const { id } = await params;
   const sp = await searchParams;
   const eventTitle = sp?.t1 && sp?.t2
-    ? `${sp.ch ? sp.ch + " " : ""}${sp.t1} vs ${sp.t2}`
+    ? `${sp.t1} ضد ${sp.t2}${sp.ch ? ` - ${sp.ch}` : ""}`
     : sp?.ch || "مباراة";
   return buildSocialMetadata({
-    title: `${eventTitle} — بث مباشر | Live Koora`,
+    title: `${eventTitle} مباشرة`,
     description: sp?.t1 && sp?.t2
-      ? `شاهد ${sp.t1} ضد ${sp.t2}${sp.ch ? ` في ${sp.ch}` : ""} بث مباشر HD. مشاهدة مباريات اليوم كورة لايف بدون تقطيع على Live Koora.`
+      ? `تابع صفحة ${sp.t1} ضد ${sp.t2}${sp.ch ? ` ضمن ${sp.ch}` : ""} مع تفاصيل المباراة ومصادر المشاهدة المتاحة.`
       : sp?.ch
-      ? `شاهد ${sp.ch} بث مباشر HD. مشاهدة مباريات اليوم كورة لايف بدون تقطيع.`
-      : `شاهد البث المباشر HD. مشاهدة مباريات اليوم كورة لايف بدون تقطيع.`,
+      ? `تابع مباريات ${sp.ch} مع تفاصيل البث والقنوات المتاحة.`
+      : `تابع تفاصيل المباراة ومصادر المشاهدة المتاحة عند توفرها.`,
     path: `/watch/event/${id}`,
   });
 }
@@ -54,14 +55,14 @@ export default async function EventWatchPage({
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
           <p className="mb-4 text-[hsl(var(--muted-foreground))]">
-            لا توجد بثوث متاحة لهذه المباراة.
+            لا توجد مصادر مشاهدة متاحة لهذه المباراة حالياً.
           </p>
-          <a
+          <Link
             href="/"
             className="text-sm underline underline-offset-4 hover:text-[hsl(var(--foreground))]"
           >
             العودة إلى المباريات
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -85,7 +86,7 @@ export default async function EventWatchPage({
     "@context": "https://schema.org",
     "@type": "SportsEvent",
     name: sp?.t1 && sp?.t2
-      ? `${sp.ch ? sp.ch + " — " : ""}${sp.t1} vs ${sp.t2}`
+      ? `${sp.t1} ضد ${sp.t2}${sp.ch ? ` - ${sp.ch}` : ""}`
       : sp?.ch || "مباراة",
     ...(sp?.st && {
       startDate: new Date(parseInt(sp.st, 10) * 1000).toISOString(),

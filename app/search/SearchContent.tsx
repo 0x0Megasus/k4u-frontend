@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { getCategories, getCategoryChannels } from "@/lib/api";
 import { Channel, Category } from "@/lib/types";
 import ChannelCard from "@/components/ChannelCard";
@@ -12,7 +12,6 @@ export default function SearchContent() {
   const router = useRouter();
   const initialQuery = searchParams.get("q") || "";
   const [query, setQuery] = useState(initialQuery);
-  const [results, setResults] = useState<Channel[]>([]);
   const [loading, setLoading] = useState(true);
   const [allChannels, setAllChannels] = useState<Channel[]>([]);
 
@@ -53,23 +52,21 @@ export default function SearchContent() {
     loadAll();
   }, []);
 
-  useEffect(() => {
+  const results = useMemo(() => {
     if (!query.trim()) {
-      setResults([]);
-      return;
+      return [];
     }
     const q = query.toLowerCase();
-    const filtered = allChannels.filter((ch) =>
+    return allChannels.filter((ch) =>
       ch.name.toLowerCase().includes(q)
     );
-    setResults(filtered);
   }, [query, allChannels]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
-      <h1 className="mb-1 text-2xl font-bold tracking-tight">بحث</h1>
+      <h1 className="mb-1 text-2xl font-bold tracking-tight">البحث عن قناة</h1>
       <p className="mb-6 text-sm text-[hsl(var(--muted-foreground))]">
-        ابحث عن القنوات بالاسم
+        اكتب اسم القناة للوصول إليها بسرعة.
       </p>
 
       <style>{`
@@ -94,7 +91,7 @@ export default function SearchContent() {
               { scroll: false }
             );
           }}
-          placeholder="ابحث عن القنوات..."
+          placeholder="اسم القناة..."
           autoFocus
           className="h-11 w-full rounded-[2px] border-2 border-[hsl(var(--border))] bg-[hsl(var(--card))] ps-9 pe-10 text-sm outline-none transition-all placeholder:text-[hsl(var(--muted-foreground))] focus:border-violet-500/40"
         />
@@ -131,7 +128,7 @@ export default function SearchContent() {
           <div className="text-center">
             <SearchIcon className="mx-auto mb-3 h-10 w-10 text-[hsl(var(--muted))]" />
             <p className="text-sm text-[hsl(var(--muted-foreground))]">
-              لا توجد قنوات لـ &ldquo;{query}&rdquo;
+              لم نجد قناة مطابقة لـ &ldquo;{query}&rdquo;.
             </p>
           </div>
         </div>

@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 
 const BASE_URL = "https://www.livekoora.watch";
 
-const SITE_NAME_AR = "Live Koora — بث مباشر مباريات اليوم";
+const SITE_NAME_AR = "Live Koora — مباريات اليوم مباشرة";
 const SITE_NAME_EN = "Live Koora — Live Football Streaming";
-const DEFAULT_DESC_AR = "شاهد مباريات اليوم بث مباشر على Live Koora. بث مباشر كورة لايف بدون تقطيع، مشاهدة المباريات HD، ونتائج فورية لجميع البطولات.";
-const DEFAULT_DESC_EN = "Watch koora live today matches free in HD streaming. Live football streaming, real-time scores, match schedules, and sports TV online.";
+const DEFAULT_DESC_AR = "تابع مباريات اليوم والقنوات الناقلة في مكان واحد، مع روابط مشاهدة محدثة وتفاصيل واضحة لكل مباراة.";
+const DEFAULT_DESC_EN = "Follow today's football matches, available channels, and updated live viewing links in one place.";
 const DEFAULT_OG_IMAGE = `${BASE_URL}/og-default.jpg`;
 
 interface SEOProps {
@@ -23,7 +23,7 @@ export function buildSocialMetadata({
   description,
   path,
   ogImage = DEFAULT_OG_IMAGE,
-  ogImageAlt = "Live Koora — بث مباشر مباريات اليوم",
+  ogImageAlt = "Live Koora — مباريات اليوم مباشرة",
   ogType = "website",
   noindex = false,
 }: SEOProps): Metadata {

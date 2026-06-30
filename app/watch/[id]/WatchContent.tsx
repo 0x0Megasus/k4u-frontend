@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import VideoPlayer from "@/components/VideoPlayer";
 import Link from "next/link";
 import { ArrowLeft, Wifi, WifiLow } from "lucide-react";
@@ -26,12 +26,7 @@ export default function WatchContent({
 }: WatchContentProps) {
   // SSR-safe: filter low quality during render
   const filtered = useMemo(() => filterQualities(sources), [sources]);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-
-  // Client-only: auto-select based on connection speed after mount
-  useEffect(() => {
-    setSelectedIndex(autoSelectIndex(filtered));
-  }, [filtered]);
+  const [selectedIndex, setSelectedIndex] = useState(() => autoSelectIndex(filtered));
 
   const currentSource = filtered[selectedIndex] ?? filtered[0] ?? null;
   const streamUrl = currentSource
@@ -45,7 +40,7 @@ export default function WatchContent({
         className="mb-4 inline-flex items-center gap-1.5 text-xs text-[hsl(var(--muted-foreground))] transition-colors hover:text-[hsl(var(--foreground))]"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
-        تصفح
+        القنوات
       </Link>
 
       <div className="space-y-3">

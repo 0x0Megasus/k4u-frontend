@@ -4,7 +4,7 @@ import { buildSocialMetadata } from "@/lib/seo";
 export const metadata = buildSocialMetadata({
   title: "الصفحة غير موجودة — Live Koora",
   description:
-    "عذرًا، الصفحة التي تبحث عنها غير موجودة. عد إلى الصفحة الرئيسية لمشاهدة مباريات اليوم بث مباشر على Live Koora.",
+    "الصفحة التي تحاول الوصول إليها غير متاحة. عد إلى مباريات اليوم أو تصفح القنوات الرياضية.",
   path: "",
 });
 
@@ -20,7 +20,7 @@ export default function NotFound() {
           href="/"
           className="rounded-[2px] border-2 border-[hsl(var(--border))] px-4 py-2 text-xs font-semibold transition-all hover:border-violet-500/40 hover:text-violet-300"
         >
-          العودة إلى المباريات
+          العودة إلى مباريات اليوم
         </Link>
       </div>
     </>

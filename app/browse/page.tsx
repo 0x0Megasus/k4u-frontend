@@ -6,9 +6,9 @@ import { buildSocialMetadata, BASE_URL } from "@/lib/seo";
 export const dynamic = "force-dynamic";
 
 export const metadata = buildSocialMetadata({
-  title: "جميع قنوات البث المباشر — Live Koora",
+  title: "القنوات الرياضية",
   description:
-    "تصفح جميع قنوات البث المباشر الرياضية. قنوات HD لمشاهدة مباريات اليوم كورة لايف بث مباشر بدون تقطيع.",
+    "تصفح القنوات الرياضية المتاحة واختر القناة المناسبة لمتابعة المباريات والبرامج الرياضية.",
   path: "/browse",
 });
 
@@ -20,7 +20,7 @@ const breadcrumbSchema = {
     {
       "@type": "ListItem",
       position: 2,
-      name: "القنوات",
+      name: "القنوات الرياضية",
       item: `${BASE_URL}/browse`,
     },
   ],
@@ -32,7 +32,7 @@ export default async function BrowsePage() {
   if (!result.success) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-20 text-center">
-        <p className="text-[hsl(var(--muted-foreground))]">تعذر تحميل التصنيفات.</p>
+        <p className="text-[hsl(var(--muted-foreground))]">تعذر تحميل القنوات حالياً.</p>
       </div>
     );
   }
@@ -49,14 +49,14 @@ export default async function BrowsePage() {
       <JsonLd data={breadcrumbSchema} />
       <div className="mx-auto max-w-7xl px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">قنوات beIN SPORTS</h1>
+          <h1 className="text-3xl font-bold tracking-tight">القنوات الرياضية</h1>
           <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-            تصفح قنوات بي إن سبورت المتاحة لمشاهدة مباريات اليوم مباشرة
+            اختر القناة التي تريد متابعتها من القائمة المتاحة.
           </p>
         </div>
 
         {categories.length === 0 ? (
-          <p className="text-[hsl(var(--muted-foreground))]">لا توجد قنوات متاحة.</p>
+          <p className="text-[hsl(var(--muted-foreground))]">لا توجد قنوات متاحة حالياً.</p>
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             {categories.map((category) => (

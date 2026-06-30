@@ -3,6 +3,7 @@ import WatchContent from "./WatchContent";
 import { JsonLd } from "@/components/JsonLd";
 import { buildSocialMetadata, BASE_URL } from "@/lib/seo";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -18,8 +19,8 @@ export async function generateMetadata({
   const sp = await searchParams;
   const channelName = sp?.name || `القناة ${id}`;
   return buildSocialMetadata({
-    title: `${channelName} — بث مباشر | Live Koora`,
-    description: `شاهد ${channelName} بث مباشر HD. مشاهدة قنوات كرة القدم اليوم live football streaming على Live Koora.`,
+    title: `${channelName} مباشرة`,
+    description: `صفحة مشاهدة ${channelName} مع مصادر البث المتاحة وروابط محدثة عند توفرها.`,
     path: `/watch/${id}`,
   });
 }
@@ -43,14 +44,14 @@ export default async function WatchPage({
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
           <p className="mb-4 text-[hsl(var(--muted-foreground))]">
-            تعذر تحميل هذه القناة.
+            تعذر تحميل هذه القناة حالياً.
           </p>
-          <a
+          <Link
             href="/"
             className="text-sm underline underline-offset-4 hover:text-[hsl(var(--foreground))]"
           >
             العودة إلى المباريات
-          </a>
+          </Link>
         </div>
       </div>
     );

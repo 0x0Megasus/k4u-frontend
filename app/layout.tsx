@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cairo } from "next/font/google";
+import Script from "next/script";
 import Navbar from "@/components/Navbar";
 import "./globals.css";
 
@@ -13,20 +14,18 @@ const cairo = Cairo({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.livekoora.watch"),
   title: {
-    default: "Live Koora — بث مباشر مباريات اليوم | مشاهدة كورة لايف HD",
+    default: "Live Koora — مباريات اليوم مباشرة",
     template: "%s | Live Koora",
   },
   description:
-    "شاهد مباريات اليوم بث مباشر على Live Koora. كورة لايف بث مباشر بدون تقطيع، مشاهدة مباريات كرة القدم HD، متابعة البطولات العالمية والنتائج الفورية.",
+    "تابع مباريات اليوم والقنوات الناقلة في مكان واحد، مع روابط مشاهدة محدثة وتفاصيل واضحة لكل مباراة.",
   keywords: [
-    "koora live today matches", "watch koora live free", "koora live hd streaming",
-    "koora live football matches today", "live koora tv matches schedule",
-    "koora live streaming without ads", "koora live mobile streaming", "koora live now match",
-    "live football streaming", "football live scores", "match today live",
-    "sports live tv online", "football fixtures today", "live sports streaming free",
-    "HD football stream", "real-time football results",
-    "كورة لايف", "بث مباشر كورة لايف", "مشاهدة مباريات اليوم كورة لايف",
-    "كورة لايف مباشر", "كورة لايف بدون تقطيع", "مباريات اليوم بث مباشر",
+    "مباريات اليوم",
+    "القنوات الناقلة",
+    "بث مباشر مباريات",
+    "جدول مباريات اليوم",
+    "live football matches",
+    "football live streaming",
   ],
   icons: {
     icon: [
@@ -39,9 +38,9 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ar_AR",
     siteName: "Live Koora",
-    title: "Live Koora — بث مباشر مباريات اليوم | مشاهدة كورة لايف HD",
+    title: "Live Koora — مباريات اليوم مباشرة",
     description:
-      "شاهد مباريات اليوم بث مباشر على Live Koora. كورة لايف بث مباشر بدون تقطيع، مشاهدة مباريات كرة القدم HD، متابعة البطولات العالمية والنتائج الفورية.",
+      "تابع مباريات اليوم والقنوات الناقلة في مكان واحد، مع روابط مشاهدة محدثة وتفاصيل واضحة لكل مباراة.",
     url: "https://www.livekoora.watch",
     images: [
       {
@@ -49,16 +48,16 @@ export const metadata: Metadata = {
         secureUrl: "https://www.livekoora.watch/og-default.jpg",
         width: 1200,
         height: 630,
-        alt: "Live Koora — بث مباشر مباريات اليوم",
+        alt: "Live Koora — مباريات اليوم مباشرة",
         type: "image/jpeg",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Live Koora — بث مباشر مباريات اليوم | مشاهدة كورة لايف HD",
+    title: "Live Koora — مباريات اليوم مباشرة",
     description:
-      "شاهد مباريات اليوم بث مباشر على Live Koora. كورة لايف بث مباشر بدون تقطيع.",
+      "تابع مباريات اليوم والقنوات الناقلة بروابط مشاهدة محدثة.",
     images: ["https://www.livekoora.watch/og-default.jpg"],
   },
   alternates: {
@@ -83,14 +82,17 @@ export default function RootLayout({
     <html lang="ar" dir="rtl" className="dark">
     <head>
       <meta name="google-adsense-account" content="ca-pub-4441418851071523"></meta>
-      {/* google ads script */}
-      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4441418851071523" crossOrigin="anonymous"></script>
-      
-      {/* adsterra Popunder_1 ad unit script */}
-      <script src="https://pl30124698.effectivecpmnetwork.com/fe/86/f8/fe86f81383b02f92841fc41fa464e5fb.js"></script>
-      
     </head>
       <body className={`${cairo.variable} min-h-screen antialiased`}>
+        <Script
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4441418851071523"
+          strategy="afterInteractive"
+          crossOrigin="anonymous"
+        />
+        <Script
+          src="https://pl30124698.effectivecpmnetwork.com/fe/86/f8/fe86f81383b02f92841fc41fa464e5fb.js"
+          strategy="afterInteractive"
+        />
         <Navbar />
         <main>{children}</main>
 
@@ -102,7 +104,7 @@ export default function RootLayout({
              data-ad-format="auto"
              data-full-width-responsive="true"
              suppressHydrationWarning></ins>
-        <script dangerouslySetInnerHTML={{
+        <Script id="adsbygoogle-display-init" strategy="afterInteractive" dangerouslySetInnerHTML={{
           __html: "(adsbygoogle = window.adsbygoogle || []).push({});"
         }} />
       </body>
