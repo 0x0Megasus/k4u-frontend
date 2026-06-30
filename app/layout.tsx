@@ -88,10 +88,6 @@ export default function RootLayout({
       
       {/* adsterra Popunder_1 ad unit script */}
       <script src="https://pl30124698.effectivecpmnetwork.com/fe/86/f8/fe86f81383b02f92841fc41fa464e5fb.js"></script>
-
-      {/* Preconnect to backend (Railway) for faster playlist fetches */}
-      <link rel="preconnect" href="https://k4u-backend-production.up.railway.app" />
-      <link rel="dns-prefetch" href="https://k4u-backend-production.up.railway.app" />
       
     </head>
       <body className={`${cairo.variable} min-h-screen antialiased`}>

@@ -87,13 +87,11 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
     if (isHls) {
       if (Hls.isSupported()) {
         hls = new Hls({
-          enableWorker: true,           // Offload parsing to web worker (frees main thread)
-          lowLatencyMode: false,        // Stability over minimal latency
-          backBufferLength: 60,         // Keep more back buffer for seamless quality switches
-          maxBufferLength: 60,          // Target buffer — prevents stalls on live
-          maxMaxBufferLength: 120,      // Hard cap (default was 60)
-          liveSyncDurationCount: 5,     // Stay 5 segments behind live edge (stability buffer)
-          liveMaxLatencyDurationCount: 10, // Max latency before forced catch-up
+          enableWorker: false,
+          lowLatencyMode: false,
+          backBufferLength: 30,
+          maxBufferLength: 30,
+          maxMaxBufferLength: 60,
           manifestLoadingTimeOut: 15000,
           levelLoadingTimeOut: 15000,
           fragLoadingTimeOut: 30000,
