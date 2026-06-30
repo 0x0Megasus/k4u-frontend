@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import VideoPlayer from "@/components/VideoPlayer";
 import Link from "next/link";
-import { ArrowLeft, Signal } from "lucide-react";
+import { ArrowLeft, Wifi, WifiLow } from "lucide-react";
 import { StreamToken } from "@/lib/types";
 import { getStreamProxyUrl } from "@/lib/api";
+import { autoSelectIndex, filterQualities } from "@/lib/quality";
 
 interface WatchContentProps {
   sources: StreamToken[];
@@ -21,12 +22,18 @@ function qualityLabel(name: string): string {
 
 export default function WatchContent({
   sources,
-  channelName,
   channelLogo,
 }: WatchContentProps) {
+  // SSR-safe: filter low quality during render
+  const filtered = useMemo(() => filterQualities(sources), [sources]);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const currentSource = sources[selectedIndex];
 
+  // Client-only: auto-select based on connection speed after mount
+  useEffect(() => {
+    setSelectedIndex(autoSelectIndex(filtered));
+  }, [filtered]);
+
+  const currentSource = filtered[selectedIndex] ?? filtered[0] ?? null;
   const streamUrl = currentSource
     ? getStreamProxyUrl(currentSource.token)
     : "";
@@ -44,10 +51,10 @@ export default function WatchContent({
       <div className="space-y-3">
         <VideoPlayer src={streamUrl} poster={channelLogo} />
 
-        {/* Quality selector */}
-        {sources.length > 1 && (
+        {/* Quality selector — only SD / HD */}
+        {filtered.length > 1 && (
           <div className="flex items-center gap-1.5">
-            {sources.map((source, i) => (
+            {filtered.map((source, i) => (
               <button
                 key={i}
                 onClick={() => setSelectedIndex(i)}
@@ -57,7 +64,11 @@ export default function WatchContent({
                     : "border-[hsl(var(--border))] bg-[hsl(var(--card))] text-[hsl(var(--muted-foreground))] hover:border-violet-500/30 hover:text-[hsl(var(--foreground))]"
                 }`}
               >
-                <Signal className="h-3 w-3" />
+                {i === selectedIndex ? (
+                  <Wifi className="h-3 w-3" />
+                ) : (
+                  <WifiLow className="h-3 w-3" />
+                )}
                 {qualityLabel(source.name)}
               </button>
             ))}
