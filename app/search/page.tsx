@@ -5,8 +5,8 @@ import { JsonLd } from "@/components/JsonLd";
 
 export const metadata = buildSocialMetadata({
   title: "البحث عن قناة",
-  description:
-    "ابحث بسرعة عن القنوات الرياضية المتاحة داخل Live Koora.",
+    description:
+    "ابحث عن القنوات الرياضية لمشاهدة مباريات كرة القدم بث مباشر. ابحث بالاسم للوصول السريع إلى البث المطلوب.",
   path: "/search",
   noindex: true,
 });

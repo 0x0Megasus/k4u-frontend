@@ -4,8 +4,8 @@ const BASE_URL = "https://www.livekoora.watch";
 
 const SITE_NAME_AR = "Live Koora — مباريات اليوم مباشرة";
 const SITE_NAME_EN = "Live Koora — Live Football Streaming";
-const DEFAULT_DESC_AR = "تابع مباريات اليوم والقنوات الناقلة في مكان واحد، مع روابط مشاهدة محدثة وتفاصيل واضحة لكل مباراة.";
-const DEFAULT_DESC_EN = "Follow today's football matches, available channels, and updated live viewing links in one place.";
+const DEFAULT_DESC_AR = "مشاهدة مباريات اليوم بث مباشر مجاناً بجودة HD. جدول محدث لمباريات كرة القدم مع القنوات الناقلة وروابط البث المباشر بدون تقطيع. تابع جميع البطولات العالمية والمحلية.";
+const DEFAULT_DESC_EN = "Watch today's football matches live streaming free in HD quality. Updated match schedule with TV channels and live broadcast links without buffering.";
 const DEFAULT_OG_IMAGE = `${BASE_URL}/og-default.jpg`;
 
 interface SEOProps {

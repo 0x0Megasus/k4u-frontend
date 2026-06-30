@@ -18,14 +18,23 @@ export const metadata: Metadata = {
     template: "%s | Live Koora",
   },
   description:
-    "تابع مباريات اليوم والقنوات الناقلة في مكان واحد، مع روابط مشاهدة محدثة وتفاصيل واضحة لكل مباراة.",
+    "مشاهدة مباريات اليوم بث مباشر مجاناً بجودة HD. جدول محدث لمباريات كرة القدم مع القنوات الناقلة وروابط البث المباشر بدون تقطيع.",
   keywords: [
     "مباريات اليوم",
-    "القنوات الناقلة",
-    "بث مباشر مباريات",
+    "بث مباشر مباريات كرة القدم",
+    "مشاهدة المباريات بث مباشر",
     "جدول مباريات اليوم",
-    "live football matches",
-    "football live streaming",
+    "القنوات الناقلة للمباريات",
+    "مباريات اليوم بث مباشر مجاناً",
+    "مشاهدة كرة القدم اون لاين",
+    "بث مباشر بدون تقطيع",
+    "مباريات كرة القدم اليوم",
+    "مواعيد المباريات",
+    "بث مباشر مباريات HD",
+    "مشاهدة مباريات كرة القدم",
+    "live football streaming",
+    "football match today live",
+    "live football HD",
   ],
   icons: {
     icon: [
@@ -40,7 +49,7 @@ export const metadata: Metadata = {
     siteName: "Live Koora",
     title: "Live Koora — مباريات اليوم مباشرة",
     description:
-      "تابع مباريات اليوم والقنوات الناقلة في مكان واحد، مع روابط مشاهدة محدثة وتفاصيل واضحة لكل مباراة.",
+      "مشاهدة مباريات اليوم بث مباشر مجاناً بجودة HD. جدول محدث مع القنوات الناقلة وروابط البث المباشر.",
     url: "https://www.livekoora.watch",
     images: [
       {
@@ -57,7 +66,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Live Koora — مباريات اليوم مباشرة",
     description:
-      "تابع مباريات اليوم والقنوات الناقلة بروابط مشاهدة محدثة.",
+      "شاهد مباريات اليوم بث مباشر مجاناً بجودة HD. روابط مشاهدة محدثة بدون تقطيع.",
     images: ["https://www.livekoora.watch/og-default.jpg"],
   },
   alternates: {
@@ -71,6 +80,13 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+};
+
+export const viewport = {
+  themeColor: "dark",
+  width: "device-width" as const,
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function RootLayout({

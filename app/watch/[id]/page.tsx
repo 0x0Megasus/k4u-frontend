@@ -20,7 +20,7 @@ export async function generateMetadata({
   const channelName = sp?.name || `القناة ${id}`;
   return buildSocialMetadata({
     title: `${channelName} مباشرة`,
-    description: `صفحة مشاهدة ${channelName} مع مصادر البث المتاحة وروابط محدثة عند توفرها.`,
+    description: `شاهد ${channelName} بث مباشر الآن. مشاهدة القناة بجودة HD مع روابط بث محدثة ومتعددة لمتابعة المباريات بدون تقطيع.`,
     path: `/watch/${id}`,
   });
 }

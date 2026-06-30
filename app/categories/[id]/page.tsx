@@ -21,7 +21,7 @@ export async function generateMetadata({
     catsResult.data?.find((c) => c.id === categoryId)?.name ?? "القنوات الرياضية";
   return buildSocialMetadata({
     title: `${categoryName} مباشرة`,
-    description: `تصفح قنوات ${categoryName} المتاحة واختر البث المناسب للمشاهدة.`,
+    description: `مشاهدة قنوات ${categoryName} بث مباشر لمباريات كرة القدم. اختر القناة وتابع المباريات بجودة HD بدون تقطيع.`,
     path: `/categories/${id}`,
   });
 }
