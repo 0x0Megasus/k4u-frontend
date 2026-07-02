@@ -8,9 +8,12 @@ interface VideoPlayerProps {
   src: string;
   poster?: string;
   isLive?: boolean;
+  /** Fired when all retry attempts for a fatal network error are exhausted.
+   *  The parent should try a different source URL (e.g. switch from HD to SD). */
+  onSourceError?: () => void;
 }
 
-export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
+export default function VideoPlayer({ src, poster, isLive, onSourceError }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const volumeRef = useRef<HTMLDivElement>(null);
@@ -110,30 +113,34 @@ export default function VideoPlayer({ src, poster, isLive }: VideoPlayerProps) {
           if (!data.fatal) return;
           console.error("HLS fatal error:", data.type, data.details);
 
-          if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-            if (data.details === "manifestParsingError") {
-              // HLS playlist is not valid M3U8 (e.g. old proxy served HTML as stream)
-              setError("مصدر البث غير متاح حالياً.");
-            } else if (data.details === "manifestLoadError") {
-              // Retry manifest loading with bounded backoff
-              if (manifestRetries < MAX_MANIFEST_RETRIES) {
-                manifestRetries++;
-                const delay = manifestRetries * 1500;
-                setTimeout(() => hls?.startLoad(), delay);
-              } else {
-                // Backend returned an error (e.g. 502 for unresolvable URL)
+            if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+              if (data.details === "manifestParsingError") {
+                // HLS playlist is not valid M3U8 (e.g. old proxy served HTML as stream)
                 setError("مصدر البث غير متاح حالياً.");
-              }
-            } else {
-              // Other network errors: bounded retry
-              if (manifestRetries < MAX_MANIFEST_RETRIES) {
-                manifestRetries++;
-                setTimeout(() => hls?.startLoad(), 1000);
+                onSourceError?.();
+              } else if (data.details === "manifestLoadError") {
+                // Retry manifest loading with bounded backoff
+                if (manifestRetries < MAX_MANIFEST_RETRIES) {
+                  manifestRetries++;
+                  const delay = manifestRetries * 1500;
+                  setTimeout(() => hls?.startLoad(), delay);
+                } else {
+                  // Backend returned an error (e.g. 502 for unresolvable URL)
+                  // Ask parent to try next source quality (e.g. SD instead of HD)
+                  setError("مصدر البث غير متاح حالياً.");
+                  onSourceError?.();
+                }
               } else {
-                setError("انقطع الاتصال بمصدر البث. حاول مرة أخرى بعد قليل.");
+                // Other network errors: bounded retry
+                if (manifestRetries < MAX_MANIFEST_RETRIES) {
+                  manifestRetries++;
+                  setTimeout(() => hls?.startLoad(), 1000);
+                } else {
+                  setError("انقطع الاتصال بمصدر البث. حاول مرة أخرى بعد قليل.");
+                  onSourceError?.();
+                }
               }
-            }
-          } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+            } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
             if (recoveryAttempts < 3) {
               recoveryAttempts++;
               hls?.recoverMediaError();

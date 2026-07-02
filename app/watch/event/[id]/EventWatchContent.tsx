@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import VideoPlayer from "@/components/VideoPlayer";
 import Link from "next/link";
 import { ArrowLeft, Trophy, Swords, Clock, Wifi, WifiLow } from "lucide-react";
@@ -82,6 +82,12 @@ export default function EventWatchContent({
   const live = now !== null && now >= startTime && now <= endTime;
   const upcoming = now !== null && !live && now < startTime;
 
+  // When the current source fails (502 from proxy), try the next quality.
+  const handleSourceError = useCallback(() => {
+    if (filtered.length <= 1) return;
+    setSelectedIndex((prev) => (prev + 1) % filtered.length);
+  }, [filtered.length]);
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-6">
       <Link
@@ -95,7 +101,7 @@ export default function EventWatchContent({
       <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
         {/* Main content */}
         <div className="space-y-4">
-          <VideoPlayer src={streamUrl} isLive={live} />
+          <VideoPlayer src={streamUrl} isLive={live} onSourceError={handleSourceError} />
 
           {/* Match info */}
           <div className="space-y-3 border-2 border-[hsl(var(--border))] bg-[hsl(var(--card))] rounded-[2px] p-4">

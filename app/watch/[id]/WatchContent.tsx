@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import VideoPlayer from "@/components/VideoPlayer";
 import Link from "next/link";
 import { ArrowLeft, Wifi, WifiLow } from "lucide-react";
@@ -33,6 +33,13 @@ export default function WatchContent({
     ? getStreamProxyUrl(currentSource.token)
     : "";
 
+  // When the current source fails (502 from proxy), try the next quality.
+  // This handles CDN node failures: if HD is down, auto-fallback to SD.
+  const handleSourceError = useCallback(() => {
+    if (filtered.length <= 1) return; // No other source to try
+    setSelectedIndex((prev) => (prev + 1) % filtered.length);
+  }, [filtered.length]);
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-6">
       <Link
@@ -44,7 +51,11 @@ export default function WatchContent({
       </Link>
 
       <div className="space-y-3">
-        <VideoPlayer src={streamUrl} poster={channelLogo} />
+        <VideoPlayer
+          src={streamUrl}
+          poster={channelLogo}
+          onSourceError={handleSourceError}
+        />
 
         {/* Quality selector — only SD / HD */}
         {filtered.length > 1 && (
