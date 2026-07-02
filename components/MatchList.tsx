@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Play } from "lucide-react";
 import { MatchEvent } from "@/lib/types";
@@ -18,20 +18,20 @@ function formatTime(unix: number): string {
   return `${String(h12).padStart(2, "0")}:${String(m).padStart(2, "0")} ${isPM ? "PM" : "AM"}`;
 }
 
-function isLive(event: MatchEvent): boolean {
-  const now = Math.floor(Date.now() / 1000);
-  return now >= event.start_time && now <= event.end_time;
-}
-
-function isPast(event: MatchEvent): boolean {
-  const now = Math.floor(Date.now() / 1000);
-  return now > event.end_time;
-}
-
-function eventKey(event: MatchEvent): string {
-  if (isLive(event)) return `0-${event.start_time}`;
-  if (isPast(event)) return `2-${event.start_time}`;
-  return `1-${event.start_time}`;
+function classifyEvents(events: MatchEvent[], now: number) {
+  const live: MatchEvent[] = [];
+  const upcoming: MatchEvent[] = [];
+  const past: MatchEvent[] = [];
+  for (const e of events) {
+    if (now >= e.start_time && now <= e.end_time) {
+      live.push(e);
+    } else if (now > e.end_time) {
+      past.push(e);
+    } else {
+      upcoming.push(e);
+    }
+  }
+  return { live, upcoming, past };
 }
 
 function LogoImg({
@@ -63,9 +63,8 @@ function LogoImg({
   );
 }
 
-function MatchCard({ event }: { event: MatchEvent }) {
+function MatchCard({ event, live }: { event: MatchEvent; live: boolean }) {
   const router = useRouter();
-  const live = isLive(event);
 
   const handleClick = () => {
     const params = new URLSearchParams({
@@ -164,12 +163,17 @@ function MatchCard({ event }: { event: MatchEvent }) {
 }
 
 export default function MatchList({ events }: MatchListProps) {
-  const sorted = [...events].sort((a, b) =>
-    eventKey(a).localeCompare(eventKey(b))
+  // SSR-safe: null during server render, classified after hydration
+  const [now, setNow] = useState<number | null>(null);
+  useEffect(() => { setNow(Math.floor(Date.now() / 1000)); }, []);
+
+  const { live: liveEvents, upcoming: upcomingEvents, past: pastEvents } = useMemo(
+    () => classifyEvents(events, now ?? 0),
+    [events, now],
   );
-  const liveEvents = sorted.filter((e) => isLive(e));
-  const upcomingEvents = sorted.filter((e) => !isLive(e) && !isPast(e));
-  const pastEvents = sorted.filter((e) => isPast(e));
+
+  // Sort within each category by start time
+  const sortByTime = (a: MatchEvent, b: MatchEvent) => a.start_time - b.start_time;
 
   return (
     <div className="space-y-8">
@@ -177,40 +181,40 @@ export default function MatchList({ events }: MatchListProps) {
         <Play className="h-4 w-4 fill-[hsl(var(--muted-foreground))]" />
         اختر مباراة لفتح صفحة المشاهدة.
       </p>
-      {liveEvents.length > 0 && (
+      {now !== null && liveEvents.length > 0 && (
         <section>
           <h2 className="mb-3 text-sm font-semibold tracking-wider text-green-400">
             مباشر الآن
           </h2>
           <div className="space-y-2">
-            {liveEvents.map((ev) => (
-              <MatchCard key={ev.id} event={ev} />
+            {[...liveEvents].sort(sortByTime).map((ev) => (
+              <MatchCard key={ev.id} event={ev} live={true} />
             ))}
           </div>
         </section>
       )}
 
-      {upcomingEvents.length > 0 && (
+      {now !== null && upcomingEvents.length > 0 && (
         <section>
           <h2 className="mb-4 inline-block rounded-[2px] border-2 border-violet-500/20 bg-violet-500/5 px-3 py-1 text-sm font-bold tracking-wider text-violet-300">
             مباريات قادمة
           </h2>
           <div className="space-y-2">
-            {upcomingEvents.map((ev) => (
-              <MatchCard key={ev.id} event={ev} />
+            {[...upcomingEvents].sort(sortByTime).map((ev) => (
+              <MatchCard key={ev.id} event={ev} live={false} />
             ))}
           </div>
         </section>
       )}
 
-      {pastEvents.length > 0 && (
+      {now !== null && pastEvents.length > 0 && (
         <section>
           <h2 className="mb-3 text-sm font-semibold tracking-wider text-[hsl(var(--muted-foreground))/50]">
             مباريات انتهت
           </h2>
           <div className="space-y-2 opacity-50">
-            {pastEvents.map((ev) => (
-              <MatchCard key={ev.id} event={ev} />
+            {[...pastEvents].sort(sortByTime).map((ev) => (
+              <MatchCard key={ev.id} event={ev} live={false} />
             ))}
           </div>
         </section>
