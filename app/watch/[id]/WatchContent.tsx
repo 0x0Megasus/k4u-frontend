@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import VideoPlayer from "@/components/VideoPlayer";
 import Link from "next/link";
 import { ArrowLeft, Wifi, WifiLow } from "lucide-react";
@@ -35,10 +35,18 @@ export default function WatchContent({
 
   // When the current source fails (502 from proxy), try the next quality.
   // This handles CDN node failures: if HD is down, auto-fallback to SD.
+  // A ref-based counter prevents infinite cycling when all sources are broken.
+  const fallbackCountRef = useRef(0);
+  const maxFallbacks = filtered.length * 2;
   const handleSourceError = useCallback(() => {
     if (filtered.length <= 1) return; // No other source to try
+    fallbackCountRef.current++;
+    if (fallbackCountRef.current >= maxFallbacks) {
+      // All sources tried twice — let VideoPlayer show its final error
+      return;
+    }
     setSelectedIndex((prev) => (prev + 1) % filtered.length);
-  }, [filtered.length]);
+  }, [filtered.length, maxFallbacks]);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6">

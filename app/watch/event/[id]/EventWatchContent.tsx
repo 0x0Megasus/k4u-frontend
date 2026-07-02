@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import VideoPlayer from "@/components/VideoPlayer";
 import Link from "next/link";
 import { ArrowLeft, Trophy, Swords, Clock, Wifi, WifiLow } from "lucide-react";
@@ -83,10 +83,15 @@ export default function EventWatchContent({
   const upcoming = now !== null && !live && now < startTime;
 
   // When the current source fails (502 from proxy), try the next quality.
+  // A ref-based counter prevents infinite cycling when all sources are broken.
+  const fallbackCountRef = useRef(0);
+  const maxFallbacks = filtered.length * 2;
   const handleSourceError = useCallback(() => {
     if (filtered.length <= 1) return;
+    fallbackCountRef.current++;
+    if (fallbackCountRef.current >= maxFallbacks) return;
     setSelectedIndex((prev) => (prev + 1) % filtered.length);
-  }, [filtered.length]);
+  }, [filtered.length, maxFallbacks]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6">
