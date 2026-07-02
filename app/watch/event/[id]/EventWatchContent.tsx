@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import VideoPlayer from "@/components/VideoPlayer";
 import Link from "next/link";
 import { ArrowLeft, Trophy, Swords, Clock, Wifi, WifiLow } from "lucide-react";
@@ -76,9 +76,11 @@ export default function EventWatchContent({
     ? getStreamProxyUrl(currentSource.token)
     : "";
 
-  const [now] = useState(() => Math.floor(Date.now() / 1000));
-  const live = now >= startTime && now <= endTime;
-  const upcoming = !live && now < startTime;
+  // SSR-safe: null during server render, set after hydration
+  const [now, setNow] = useState<number | null>(null);
+  useEffect(() => { setNow(Math.floor(Date.now() / 1000)); }, []);
+  const live = now !== null && now >= startTime && now <= endTime;
+  const upcoming = now !== null && !live && now < startTime;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6">
