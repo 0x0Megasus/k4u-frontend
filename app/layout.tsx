@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cairo } from "next/font/google";
 import Script from "next/script";
 import Navbar from "@/components/Navbar";
+import BackButtonHandler from "@/components/BackButtonHandler";
 import "./globals.css";
 
 const cairo = Cairo({
@@ -109,6 +110,7 @@ export default function RootLayout({
           src="https://pl30124698.effectivecpmnetwork.com/fe/86/f8/fe86f81383b02f92841fc41fa464e5fb.js"
           strategy="afterInteractive"
         />
+        <BackButtonHandler />
         <Navbar />
         <main>{children}</main>
 
