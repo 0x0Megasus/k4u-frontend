@@ -229,9 +229,25 @@ export default function VideoPlayer({ src, poster, isLive, onSourceError }: Vide
     };
   }, []);
 
-  // --- Fullscreen state tracker (just for UI icon) ---
+  // --- Fullscreen state tracker + viewport restore on exit ---
   useEffect(() => {
-    const handler = () => setIsFullscreen(!!document.fullscreenElement);
+    const handler = () => {
+      const fs = !!document.fullscreenElement;
+      setIsFullscreen(fs);
+      if (!fs) {
+        // When fullscreen exits, the Android WebView viewport is often
+        // stale. Cascade reflow recovery at multiple delays.
+        const fix = () => {
+          document.body.style.height = "";
+          document.documentElement.style.height = "";
+          window.dispatchEvent(new Event("resize"));
+          window.scrollTo(0, 0);
+        };
+        requestAnimationFrame(fix);
+        setTimeout(fix, 100);
+        setTimeout(fix, 500);
+      }
+    };
     document.addEventListener("fullscreenchange", handler);
     return () => document.removeEventListener("fullscreenchange", handler);
   }, []);
@@ -249,13 +265,16 @@ export default function VideoPlayer({ src, poster, isLive, onSourceError }: Vide
         try { await (screen as any).orientation?.unlock?.(); } catch {}
       }
       setIsRotated(false);
-      // Force viewport to recalculate after unlock
-      requestAnimationFrame(() => {
+      // Cascade viewport recovery at multiple delays
+      const fix = () => {
         document.body.style.height = "";
         document.documentElement.style.height = "";
         window.dispatchEvent(new Event("resize"));
         window.scrollTo(0, 0);
-      });
+      };
+      requestAnimationFrame(fix);
+      setTimeout(fix, 100);
+      setTimeout(fix, 500);
     } else {
       // Lock to landscape
       if (plugin) {
