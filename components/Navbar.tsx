@@ -56,7 +56,7 @@ export default function Navbar() {
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[2px] text-sm font-medium transition-all text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] border-2 border-transparent hover:border-violet-500/30"
           >
             <Download className="h-3.5 w-3.5" />
-            التطبيق
+            تحميل التطبيق
           </a>
         </div>
 
@@ -105,7 +105,7 @@ export default function Navbar() {
               className="inline-flex items-center gap-2 px-3 py-2 rounded-[2px] text-sm font-medium text-[hsl(var(--muted-foreground))] border-2 border-transparent"
             >
               <Download className="h-3.5 w-3.5" />
-              التطبيق
+              تحميل التطبيق
             </a>
           </div>
         </div>
