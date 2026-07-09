@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import Hls from "hls.js";
-import { Play, Pause, Volume2, VolumeX, Maximize, Minimize } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, RotateCw } from "lucide-react";
 
 interface VideoPlayerProps {
   src: string;
@@ -50,6 +50,7 @@ export default function VideoPlayer({ src, poster, isLive, onSourceError }: Vide
   const [volume, setVolume] = useState(1);
   const [muted, setMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isRotated, setIsRotated] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
 
   // Detect small screens (< 1024px = tablet/phone)
@@ -228,44 +229,42 @@ export default function VideoPlayer({ src, poster, isLive, onSourceError }: Vide
     };
   }, []);
 
-  // --- Fullscreen + auto-rotate to landscape on mobile ---
+  // --- Fullscreen state tracker (just for UI icon) ---
   useEffect(() => {
-    const onFullscreenChange = async () => {
-      const fs = !!document.fullscreenElement;
-      setIsFullscreen(fs);
-
-      // Lock/unlock orientation on mobile
-      if (window.innerWidth < 768) {
-        if (fs) {
-          try {
-            const { ScreenOrientation } = await import("@capacitor/screen-orientation");
-            await ScreenOrientation.lock({ orientation: "landscape" });
-          } catch {
-            // Fallback to Web API if Capacitor plugin unavailable
-            try { await (screen as any).orientation?.lock?.("landscape"); } catch {}
-          }
-        } else {
-          try {
-            const { ScreenOrientation } = await import("@capacitor/screen-orientation");
-            await ScreenOrientation.unlock();
-          } catch {
-            try { await (screen as any).orientation?.unlock?.(); } catch {}
-          }
-
-          // Fix viewport after exiting fullscreen — force reflow + scroll reset
-          requestAnimationFrame(() => {
-            document.body.style.height = "";
-            document.documentElement.style.height = "";
-            window.dispatchEvent(new Event("resize"));
-            window.scrollTo(0, 0);
-          });
-        }
-      }
-    };
-
-    document.addEventListener("fullscreenchange", onFullscreenChange);
-    return () => document.removeEventListener("fullscreenchange", onFullscreenChange);
+    const handler = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", handler);
+    return () => document.removeEventListener("fullscreenchange", handler);
   }, []);
+
+  // --- Manual rotate button handler ---
+  const handleRotate = useCallback(async () => {
+    if (isRotated) {
+      // Unlock → return to auto-orientation
+      try {
+        const { ScreenOrientation } = await import("@capacitor/screen-orientation");
+        await ScreenOrientation.unlock();
+      } catch {
+        try { await (screen as any).orientation?.unlock?.(); } catch {}
+      }
+      setIsRotated(false);
+      // Force viewport to recalculate after unlock
+      requestAnimationFrame(() => {
+        document.body.style.height = "";
+        document.documentElement.style.height = "";
+        window.dispatchEvent(new Event("resize"));
+        window.scrollTo(0, 0);
+      });
+    } else {
+      // Lock to landscape
+      try {
+        const { ScreenOrientation } = await import("@capacitor/screen-orientation");
+        await ScreenOrientation.lock({ orientation: "landscape" });
+      } catch {
+        try { await (screen as any).orientation?.lock?.("landscape"); } catch {}
+      }
+      setIsRotated(true);
+    }
+  }, [isRotated]);
 
   // --- Video event handlers ---
   const handlePlay = () => setPlaying(true);
@@ -501,6 +500,15 @@ export default function VideoPlayer({ src, poster, isLive, onSourceError }: Vide
                     />
                   </div>
                 </div>
+
+                {/* Rotate */}
+                <button
+                  onClick={handleRotate}
+                  className="flex h-8 w-8 items-center justify-center rounded text-white/80 transition-colors hover:text-white"
+                  title={isRotated ? "عودة للوضع العمودي" : "تدوير للأفقي"}
+                >
+                  <RotateCw className={`h-4 w-4 transition-transform duration-300 ${isRotated ? "rotate-90" : ""}`} />
+                </button>
 
                 {/* Fullscreen */}
                 <button
