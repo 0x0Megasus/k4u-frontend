@@ -15,6 +15,15 @@ export default function BackButtonHandler() {
     let removeListener: (() => void) | null = null;
 
     (async () => {
+      // Prevent WebView from overlapping the status bar
+      try {
+        const { StatusBar } = await import("@capacitor/status-bar");
+        await StatusBar.setOverlaysWebView({ overlay: false });
+      } catch {
+        // StatusBar plugin not available
+      }
+
+      // Back button handling
       try {
         const { App } = await import("@capacitor/app");
         const handle = await App.addListener("backButton", ({ canGoBack }: { canGoBack: boolean }) => {
