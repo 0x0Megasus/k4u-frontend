@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Solid dark background that fills the entire screen -->
+    <item android:drawable="@color/splash_bg"/>
+    <!-- Centered app logo (160dp, preserves transparent rounded corners) -->
+    <item
+        android:drawable="@drawable/logo_splash"
+        android:width="160dp"
+        android:height="160dp"
+        android:gravity="center"/>
+</layer-list>

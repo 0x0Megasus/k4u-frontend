@@ -16,9 +16,8 @@
     </style>
 
 
-    <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@color/splash_bg</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_loading_arc</item>
-        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+    <!-- Launch theme: dark background with centered logo (no SplashScreen API) -->
+    <style name="AppTheme.NoActionBarLaunch" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:background">@drawable/splash_bg</item>
     </style>
 </resources>
