@@ -238,19 +238,37 @@ export default function VideoPlayer({ src, poster, isLive, onSourceError }: Vide
     } catch {}
   }, []);
 
-  // --- Fullscreen state tracker: lock to landscape in fullscreen, unlock on exit ---
+  // --- Lock/unlock orientation using Capacitor or Web Screen Orientation API ---
+  const orientLockLandscape = useCallback(async () => {
+    const cap = (window as any).Capacitor;
+    const capPlugin = cap?.Plugins?.ScreenOrientation;
+    if (capPlugin) {
+      try { await capPlugin.lock({ orientation: "landscape" }); return; } catch {}
+    }
+    // Fallback: Web Screen Orientation API (works on mobile browsers)
+    try { await (screen as any).orientation?.lock?.("landscape"); } catch {}
+  }, []);
+
+  const orientUnlock = useCallback(async () => {
+    const cap = (window as any).Capacitor;
+    const capPlugin = cap?.Plugins?.ScreenOrientation;
+    if (capPlugin) {
+      try { await capPlugin.unlock(); return; } catch {}
+    }
+    try { await (screen as any).orientation?.unlock?.(); } catch {}
+  }, []);
+
+  // --- Fullscreen state tracker: lock orientation on enter, unlock on exit ---
   useEffect(() => {
     const handler = async () => {
       const fs = !!document.fullscreenElement;
       setIsFullscreen(fs);
-      const cap = (window as any).Capacitor;
-      const plugin = cap?.Plugins?.ScreenOrientation;
       if (fs) {
         toggleStatusBar(false);
-        if (plugin) { try { await plugin.lock({ orientation: "landscape" }); } catch {} }
+        await orientLockLandscape();
       } else {
         toggleStatusBar(true);
-        if (plugin) { try { await plugin.unlock(); } catch {} }
+        await orientUnlock();
         // When fullscreen exits, the Android WebView viewport is often
         // stale. Cascade reflow recovery at multiple delays.
         const fix = () => {
@@ -266,7 +284,7 @@ export default function VideoPlayer({ src, poster, isLive, onSourceError }: Vide
     };
     document.addEventListener("fullscreenchange", handler);
     return () => document.removeEventListener("fullscreenchange", handler);
-  }, []);
+  }, [orientLockLandscape, orientUnlock]);
 
   // --- Video event handlers ---
   const handlePlay = () => setPlaying(true);
