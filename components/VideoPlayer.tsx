@@ -228,50 +228,30 @@ export default function VideoPlayer({ src, poster, isLive, onSourceError }: Vide
     };
   }, []);
 
-  // --- Fullscreen listener ---
+  // --- Fullscreen + auto-rotate to landscape on mobile ---
   useEffect(() => {
-    const handler = () => setIsFullscreen(!!document.fullscreenElement);
-    document.addEventListener("fullscreenchange", handler);
-    return () => document.removeEventListener("fullscreenchange", handler);
-  }, []);
+    const onFullscreenChange = async () => {
+      const fs = !!document.fullscreenElement;
+      setIsFullscreen(fs);
 
-  // --- Auto fullscreen on phone rotation ---
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const isMobile = () => window.innerWidth < 768;
-
-    const handleOrientationChange = () => {
-      if (!isMobile()) return;
-
-      // After a short delay to let the browser settle on the new orientation
-      setTimeout(() => {
-        if (window.innerHeight < window.innerWidth) {
-          // Landscape → enter fullscreen
-          if (!document.fullscreenElement) {
-            containerRef.current?.requestFullscreen().catch(() => {});
-          }
-        } else {
-          // Portrait → exit fullscreen
-          if (document.fullscreenElement) {
-            document.exitFullscreen().catch(() => {});
-          }
+      // Lock/unlock orientation on mobile when fullscreen changes
+      if (fs && window.innerWidth < 768) {
+        try {
+          await (screen as any).orientation?.lock?.("landscape");
+        } catch {
+          // orientation lock not supported or denied — ignore
         }
-      }, 200);
+      } else if (!fs) {
+        try {
+          await (screen as any).orientation?.unlock?.();
+        } catch {
+          // ignore
+        }
+      }
     };
 
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-
-    window.addEventListener("orientationchange", handleOrientationChange);
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-
-    return () => {
-      window.removeEventListener("orientationchange", handleOrientationChange);
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
-    };
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", onFullscreenChange);
   }, []);
 
   // --- Video event handlers ---
