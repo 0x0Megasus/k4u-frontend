@@ -31,15 +31,11 @@ body {
   background-color: hsl(var(--primary) / 0.25);
 }
 
-::-webkit-scrollbar {
-  width: 6px;
+/* Hide scrollbar visually but keep scroll functionality */
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted));
-}
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground));
+html::-webkit-scrollbar {
+  display: none;
 }
