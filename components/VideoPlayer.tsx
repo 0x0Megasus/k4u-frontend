@@ -229,12 +229,24 @@ export default function VideoPlayer({ src, poster, isLive, onSourceError }: Vide
     };
   }, []);
 
+  // --- Toggle status bar in Capacitor APK ---
+  const toggleStatusBar = useCallback(async (show: boolean) => {
+    const sb = (window as any).Capacitor?.Plugins?.StatusBar;
+    if (!sb) return;
+    try {
+      if (show) await sb.show();
+      else await sb.hide();
+    } catch {}
+  }, []);
+
   // --- Fullscreen state tracker + viewport restore on exit ---
   useEffect(() => {
     const handler = () => {
       const fs = !!document.fullscreenElement;
       setIsFullscreen(fs);
-      if (!fs) {
+      if (fs) {
+        toggleStatusBar(false); // hide status bar in fullscreen
+      } else {
         // When fullscreen exits, the Android WebView viewport is often
         // stale. Cascade reflow recovery at multiple delays.
         const fix = () => {
@@ -265,6 +277,7 @@ export default function VideoPlayer({ src, poster, isLive, onSourceError }: Vide
         try { await (screen as any).orientation?.unlock?.(); } catch {}
       }
       setIsRotated(false);
+      toggleStatusBar(true); // show status bar in portrait
       // Cascade viewport recovery at multiple delays
       const fix = () => {
         document.body.style.height = "";
@@ -283,6 +296,7 @@ export default function VideoPlayer({ src, poster, isLive, onSourceError }: Vide
         try { await (screen as any).orientation?.lock?.("landscape"); } catch {}
       }
       setIsRotated(true);
+      toggleStatusBar(false); // hide status bar in landscape
     }
   }, [isRotated]);
 
