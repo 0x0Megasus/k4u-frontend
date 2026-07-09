@@ -283,7 +283,11 @@ export default function VideoPlayer({ src, poster, isLive, onSourceError }: Vide
       }
     };
     document.addEventListener("fullscreenchange", handler);
-    return () => document.removeEventListener("fullscreenchange", handler);
+    return () => {
+      document.removeEventListener("fullscreenchange", handler);
+      // Unlock orientation when component unmounts (e.g. user navigates back)
+      orientUnlock();
+    };
   }, [orientLockLandscape, orientUnlock]);
 
   // --- Video event handlers ---

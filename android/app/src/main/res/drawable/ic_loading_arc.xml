@@ -3,23 +3,13 @@
     android:width="48dp"
     android:height="48dp"
     android:viewportWidth="48"
-    android:viewportHeight="48"
-    android:tint="#8B5CF6">
-    <!-- Outer track (dim circle) -->
+    android:viewportHeight="48">
+    <!-- Outer ring (dim track) -->
     <path
-        android:pathData="M24,4A20,20 0 1,1 24,44"
-        android:strokeWidth="3"
-        android:strokeColor="#2D2D3F"
-        android:fillColor="@android:color/transparent"
-        android:strokeLineCap="round"/>
-    <!-- Loading arc (bright arc) -->
+        android:pathData="M24,4A20,20 0 1,1 24,44A20,20 0 1,1 24,4z"
+        android:fillColor="#3A3A4A"/>
+    <!-- Inner filled dot (purple) -->
     <path
-        android:pathData="M24,4A20,20 0 0,1 44,24"
-        android:strokeWidth="3"
-        android:strokeColor="#8B5CF6"
-        android:fillColor="@android:color/transparent"
-        android:strokeLineCap="round"
-        android:trimPathStart="0"
-        android:trimPathEnd="0.35"
-        android:trimPathOffset="0.5"/>
+        android:pathData="M24,14A10,10 0 1,1 24,34A10,10 0 1,1 24,14z"
+        android:fillColor="#8B5CF6"/>
 </vector>
