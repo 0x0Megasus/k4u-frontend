@@ -99,7 +99,7 @@ export default function VideoPlayer({ src, poster, isLive, onSourceError }: Vide
           liveMaxLatencyDurationCount: 10,
           manifestLoadingTimeOut: 15000,
           levelLoadingTimeOut: 15000,
-          fragLoadingTimeOut: 30000,
+          fragLoadingTimeOut: 10000,
           startLevel: -1,
           debug: false,
         });
@@ -119,17 +119,20 @@ export default function VideoPlayer({ src, poster, isLive, onSourceError }: Vide
                 setError("مصدر البث غير متاح حالياً.");
                 onSourceError?.();
               } else if (data.details === "manifestLoadError") {
-                // Retry manifest loading with bounded backoff
-                if (manifestRetries < MAX_MANIFEST_RETRIES) {
-                  manifestRetries++;
-                  const delay = manifestRetries * 1500;
-                  setTimeout(() => hls?.startLoad(), delay);
-                } else {
-                  // Backend returned an error (e.g. 502 for unresolvable URL)
-                  // Ask parent to try next source quality (e.g. SD instead of HD)
-                  setError("مصدر البث غير متاح حالياً.");
-                  onSourceError?.();
-                }
+                // Upstream CDN returned an error instead of an HLS playlist.
+                // The API sometimes returns dead stream URLs for some channels,
+                // so retrying won't help — fail immediately and let the parent
+                // cycle to the next quality source via onSourceError.
+                setError("مصدر البث غير متاح حالياً.");
+                onSourceError?.();
+              } else if (
+                data.details === "fragLoadError" ||
+                data.details === "fragParsingError"
+              ) {
+                // Segment failed to load or parse (e.g. CDN 404 / expired stream).
+                // Fail fast — retrying fragments on dead streams wastes 10+ seconds.
+                setError("مصدر البث غير متاح حالياً.");
+                onSourceError?.();
               } else {
                 // Other network errors: bounded retry
                 if (manifestRetries < MAX_MANIFEST_RETRIES) {

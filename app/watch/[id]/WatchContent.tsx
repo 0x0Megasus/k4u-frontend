@@ -65,29 +65,35 @@ export default function WatchContent({
           onSourceError={handleSourceError}
         />
 
-        {/* Quality selector — only SD / HD */}
-        {filtered.length > 1 && (
-          <div className="flex items-center gap-1.5">
-            {filtered.map((source, i) => (
-              <button
-                key={i}
-                onClick={() => setSelectedIndex(i)}
-                className={`inline-flex cursor-pointer items-center gap-1 rounded-[2px] border-2 px-2.5 py-1 text-[11px] font-semibold transition-all ${
-                  i === selectedIndex
-                    ? "border-violet-500 bg-violet-500/10 text-violet-300"
-                    : "border-[hsl(var(--border))] bg-[hsl(var(--card))] text-[hsl(var(--muted-foreground))] hover:border-violet-500/30 hover:text-[hsl(var(--foreground))]"
-                }`}
-              >
-                {i === selectedIndex ? (
-                  <Wifi className="h-3 w-3" />
-                ) : (
-                  <WifiLow className="h-3 w-3" />
-                )}
-                {qualityLabel(source.name)}
-              </button>
-            ))}
+        {/* Quality — always visible so user knows what they're watching */}
+        <div>
+          <p className="mb-2 text-[10px] font-semibold tracking-widest text-[hsl(var(--muted-foreground))]">
+            جودة البث
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {filtered.map((source, i) => {
+              const isSelected = i === selectedIndex;
+              return (
+                <button
+                  key={i}
+                  onClick={() => setSelectedIndex(i)}
+                  className={`inline-flex cursor-pointer items-center gap-1 rounded-[2px] border-2 px-3 py-1.5 text-[11px] font-semibold transition-all ${
+                    isSelected
+                      ? "border-violet-500 bg-violet-500/10 text-violet-300"
+                      : "border-[hsl(var(--border))] bg-[hsl(var(--card))] text-[hsl(var(--muted-foreground))] hover:border-violet-500/30 hover:text-[hsl(var(--foreground))]"
+                  } ${filtered.length <= 1 ? "cursor-default" : ""}`}
+                >
+                  {isSelected ? (
+                    <Wifi className="h-3 w-3" />
+                  ) : (
+                    <WifiLow className="h-3 w-3" />
+                  )}
+                  {qualityLabel(source.name)}
+                </button>
+              );
+            })}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
