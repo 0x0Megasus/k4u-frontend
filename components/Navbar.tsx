@@ -15,7 +15,7 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 border-b-2 border-[hsl(var(--border))] bg-[hsl(var(--background))/80] backdrop-blur-xl" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+    <nav className="sticky top-0 z-50 border-b-2 border-[hsl(var(--border))] bg-[hsl(var(--background))/80] backdrop-blur-xl" style={{ paddingTop: 'env(safe-area-inset-top, 24px)' }}>
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
         {/* Brand */}
         <Link
