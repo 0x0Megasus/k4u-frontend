@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Live Koora</string>
+    <string name="title_activity_main">Live Koora</string>
+    <string name="package_name">watch.livekoora.app</string>
+    <string name="custom_url_scheme">watch.livekoora.app</string>
+</resources>

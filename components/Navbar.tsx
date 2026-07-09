@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Search, Menu } from "lucide-react";
+import { Search, Menu, Download } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -47,6 +47,17 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
+
+          {/* Android APK download */}
+          <a
+            href="https://github.com/0x0Megasus/k4u-frontend/releases/latest/download/livekoora.apk"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[2px] text-sm font-medium transition-all text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] border-2 border-transparent hover:border-violet-500/30"
+          >
+            <Download className="h-3.5 w-3.5" />
+            التطبيق
+          </a>
         </div>
 
         {/* Search link — navigates to /search page */}
@@ -86,6 +97,16 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
+            <a
+              href="https://github.com/0x0Megasus/k4u-frontend/releases/latest/download/livekoora.apk"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMobileOpen(false)}
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-[2px] text-sm font-medium text-[hsl(var(--muted-foreground))] border-2 border-transparent"
+            >
+              <Download className="h-3.5 w-3.5" />
+              التطبيق
+            </a>
           </div>
         </div>
       )}
