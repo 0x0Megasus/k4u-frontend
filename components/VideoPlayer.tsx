@@ -234,18 +234,31 @@ export default function VideoPlayer({ src, poster, isLive, onSourceError }: Vide
       const fs = !!document.fullscreenElement;
       setIsFullscreen(fs);
 
-      // Lock/unlock orientation on mobile when fullscreen changes
-      if (fs && window.innerWidth < 768) {
-        try {
-          await (screen as any).orientation?.lock?.("landscape");
-        } catch {
-          // orientation lock not supported or denied — ignore
-        }
-      } else if (!fs) {
-        try {
-          await (screen as any).orientation?.unlock?.();
-        } catch {
-          // ignore
+      // Lock/unlock orientation on mobile
+      if (window.innerWidth < 768) {
+        if (fs) {
+          try {
+            const { ScreenOrientation } = await import("@capacitor/screen-orientation");
+            await ScreenOrientation.lock({ orientation: "landscape" });
+          } catch {
+            // Fallback to Web API if Capacitor plugin unavailable
+            try { await (screen as any).orientation?.lock?.("landscape"); } catch {}
+          }
+        } else {
+          try {
+            const { ScreenOrientation } = await import("@capacitor/screen-orientation");
+            await ScreenOrientation.unlock();
+          } catch {
+            try { await (screen as any).orientation?.unlock?.(); } catch {}
+          }
+
+          // Fix viewport after exiting fullscreen — force reflow + scroll reset
+          requestAnimationFrame(() => {
+            document.body.style.height = "";
+            document.documentElement.style.height = "";
+            window.dispatchEvent(new Event("resize"));
+            window.scrollTo(0, 0);
+          });
         }
       }
     };
