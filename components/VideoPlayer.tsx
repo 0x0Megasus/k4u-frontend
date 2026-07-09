@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import Hls from "hls.js";
-import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, RotateCw } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize, Minimize } from "lucide-react";
 
 interface VideoPlayerProps {
   src: string;
@@ -238,12 +238,14 @@ export default function VideoPlayer({ src, poster, isLive, onSourceError }: Vide
 
   // --- Manual rotate button handler ---
   const handleRotate = useCallback(async () => {
+    const cap = (window as any).Capacitor;
+    const plugin = cap?.Plugins?.ScreenOrientation;
+
     if (isRotated) {
       // Unlock → return to auto-orientation
-      try {
-        const { ScreenOrientation } = await import("@capacitor/screen-orientation");
-        await ScreenOrientation.unlock();
-      } catch {
+      if (plugin) {
+        try { await plugin.unlock(); } catch {}
+      } else {
         try { await (screen as any).orientation?.unlock?.(); } catch {}
       }
       setIsRotated(false);
@@ -256,10 +258,9 @@ export default function VideoPlayer({ src, poster, isLive, onSourceError }: Vide
       });
     } else {
       // Lock to landscape
-      try {
-        const { ScreenOrientation } = await import("@capacitor/screen-orientation");
-        await ScreenOrientation.lock({ orientation: "landscape" });
-      } catch {
+      if (plugin) {
+        try { await plugin.lock({ orientation: "landscape" }); } catch {}
+      } else {
         try { await (screen as any).orientation?.lock?.("landscape"); } catch {}
       }
       setIsRotated(true);
@@ -501,13 +502,31 @@ export default function VideoPlayer({ src, poster, isLive, onSourceError }: Vide
                   </div>
                 </div>
 
-                {/* Rotate */}
+                {/* Rotate phone screen */}
                 <button
                   onClick={handleRotate}
-                  className="flex h-8 w-8 items-center justify-center rounded text-white/80 transition-colors hover:text-white"
-                  title={isRotated ? "عودة للوضع العمودي" : "تدوير للأفقي"}
+                  className="flex h-8 w-8 items-center justify-center rounded text-white/80 transition-colors hover:text-white group"
+                  title={isRotated ? "Return to portrait" : "Rotate to landscape"}
                 >
-                  <RotateCw className={`h-4 w-4 transition-transform duration-300 ${isRotated ? "rotate-90" : ""}`} />
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className={`h-4 w-4 transition-transform duration-300 ${isRotated ? "rotate-90" : ""}`}
+                  >
+                    {/* Phone body */}
+                    <rect x="5" y="2" width="14" height="20" rx="2" className={isRotated ? "hidden" : ""} />
+                    {/* Phone body - landscape */}
+                    <rect x="2" y="5" width="20" height="14" rx="2" className={isRotated ? "" : "hidden"} />
+                    {/* Rotate arrow */}
+                    <path d="M17 2l3 3-3 3" className={isRotated ? "hidden" : ""} />
+                    <path d="M7 22l-3-3 3-3" className={isRotated ? "" : "hidden"} />
+                    <path d="M20 5h-4a3 3 0 00-3 3v2" className={isRotated ? "hidden" : ""} />
+                    <path d="M4 19h4a3 3 0 003-3v-2" className={isRotated ? "" : "hidden"} />
+                  </svg>
                 </button>
 
                 {/* Fullscreen */}
