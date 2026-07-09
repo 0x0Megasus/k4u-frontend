@@ -101,7 +101,7 @@ export default function RootLayout({
       <meta name="google-adsense-account" content="ca-pub-4441418851071523"></meta>
     </head>
       <body className={`${cairo.variable} min-h-screen antialiased`}>
-        <Script
+        {/* <Script
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4441418851071523"
           strategy="afterInteractive"
           crossOrigin="anonymous"
@@ -109,13 +109,13 @@ export default function RootLayout({
         <Script
           src="https://pl30124698.effectivecpmnetwork.com/fe/86/f8/fe86f81383b02f92841fc41fa464e5fb.js"
           strategy="afterInteractive"
-        />
+        /> */}
         <BackButtonHandler />
         <Navbar />
         <main>{children}</main>
 
         {/* display ad unit_001 — suppressHydrationWarning because AdSense mutates the DOM before hydration */}
-        <ins className="adsbygoogle"
+        {/* <ins className="adsbygoogle"
              style={{ display: "block" }}
              data-ad-client="ca-pub-4441418851071523"
              data-ad-slot="8436459990"
@@ -124,7 +124,7 @@ export default function RootLayout({
              suppressHydrationWarning></ins>
         <Script id="adsbygoogle-display-init" strategy="afterInteractive" dangerouslySetInnerHTML={{
           __html: "(adsbygoogle = window.adsbygoogle || []).push({});"
-        }} />
+        }} /> */}
       </body>
     </html>
   );
