@@ -50,7 +50,6 @@ export default function VideoPlayer({ src, poster, isLive, onSourceError }: Vide
   const [volume, setVolume] = useState(1);
   const [muted, setMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isRotated, setIsRotated] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
 
   // Detect small screens (< 1024px = tablet/phone)
@@ -239,14 +238,19 @@ export default function VideoPlayer({ src, poster, isLive, onSourceError }: Vide
     } catch {}
   }, []);
 
-  // --- Fullscreen state tracker + viewport restore on exit ---
+  // --- Fullscreen state tracker: lock to landscape in fullscreen, unlock on exit ---
   useEffect(() => {
-    const handler = () => {
+    const handler = async () => {
       const fs = !!document.fullscreenElement;
       setIsFullscreen(fs);
+      const cap = (window as any).Capacitor;
+      const plugin = cap?.Plugins?.ScreenOrientation;
       if (fs) {
-        toggleStatusBar(false); // hide status bar in fullscreen
+        toggleStatusBar(false);
+        if (plugin) { try { await plugin.lock({ orientation: "landscape" }); } catch {} }
       } else {
+        toggleStatusBar(true);
+        if (plugin) { try { await plugin.unlock(); } catch {} }
         // When fullscreen exits, the Android WebView viewport is often
         // stale. Cascade reflow recovery at multiple delays.
         const fix = () => {
@@ -263,42 +267,6 @@ export default function VideoPlayer({ src, poster, isLive, onSourceError }: Vide
     document.addEventListener("fullscreenchange", handler);
     return () => document.removeEventListener("fullscreenchange", handler);
   }, []);
-
-  // --- Manual rotate button handler ---
-  const handleRotate = useCallback(async () => {
-    const cap = (window as any).Capacitor;
-    const plugin = cap?.Plugins?.ScreenOrientation;
-
-    if (isRotated) {
-      // Unlock → return to auto-orientation
-      if (plugin) {
-        try { await plugin.unlock(); } catch {}
-      } else {
-        try { await (screen as any).orientation?.unlock?.(); } catch {}
-      }
-      setIsRotated(false);
-      toggleStatusBar(true); // show status bar in portrait
-      // Cascade viewport recovery at multiple delays
-      const fix = () => {
-        document.body.style.height = "";
-        document.documentElement.style.height = "";
-        window.dispatchEvent(new Event("resize"));
-        window.scrollTo(0, 0);
-      };
-      requestAnimationFrame(fix);
-      setTimeout(fix, 100);
-      setTimeout(fix, 500);
-    } else {
-      // Lock to landscape
-      if (plugin) {
-        try { await plugin.lock({ orientation: "landscape" }); } catch {}
-      } else {
-        try { await (screen as any).orientation?.lock?.("landscape"); } catch {}
-      }
-      setIsRotated(true);
-      toggleStatusBar(false); // hide status bar in landscape
-    }
-  }, [isRotated]);
 
   // --- Video event handlers ---
   const handlePlay = () => setPlaying(true);
@@ -534,33 +502,6 @@ export default function VideoPlayer({ src, poster, isLive, onSourceError }: Vide
                     />
                   </div>
                 </div>
-
-                {/* Rotate phone screen */}
-                <button
-                  onClick={handleRotate}
-                  className="flex h-8 w-8 items-center justify-center rounded text-white/80 transition-colors hover:text-white group"
-                  title={isRotated ? "Return to portrait" : "Rotate to landscape"}
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className={`h-4 w-4 transition-transform duration-300 ${isRotated ? "rotate-90" : ""}`}
-                  >
-                    {/* Phone body */}
-                    <rect x="5" y="2" width="14" height="20" rx="2" className={isRotated ? "hidden" : ""} />
-                    {/* Phone body - landscape */}
-                    <rect x="2" y="5" width="20" height="14" rx="2" className={isRotated ? "" : "hidden"} />
-                    {/* Rotate arrow */}
-                    <path d="M17 2l3 3-3 3" className={isRotated ? "hidden" : ""} />
-                    <path d="M7 22l-3-3 3-3" className={isRotated ? "" : "hidden"} />
-                    <path d="M20 5h-4a3 3 0 00-3 3v2" className={isRotated ? "hidden" : ""} />
-                    <path d="M4 19h4a3 3 0 003-3v-2" className={isRotated ? "" : "hidden"} />
-                  </svg>
-                </button>
 
                 {/* Fullscreen */}
                 <button
